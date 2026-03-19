@@ -50,7 +50,7 @@ def run_ingestion():
     user = os.getenv("NEO4J_USERNAME", "neo4j")
     password = os.getenv("NEO4J_PASSWORD", "12345678")
     
-    data_dir = r"C:\Users\Prabha\.gemini\antigravity\scratch\graph-data-loader\parquet_data_set"
+    data_dir = "/Users/amandasi/Code/graph-data-loader/iam_dataset_new"  # Update this path to your dataset location
     
     driver = GraphDatabase.driver(uri, auth=(user, password))
     

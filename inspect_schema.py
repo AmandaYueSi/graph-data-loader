@@ -3,7 +3,7 @@ import os
 import json
 
 def inspect_schemas():
-    dir_path = r"C:\Users\Prabha\.gemini\antigravity\scratch\graph-data-loader\parquet_data_set"
+    dir_path = "/Users/amandasi/Code/graph-data-loader/parquet_data_set"
     if not os.path.exists(dir_path):
         print(f"Directory not found: {dir_path}")
         return

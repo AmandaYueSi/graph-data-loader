@@ -1,0 +1,4 @@
+1.	Data Loading: Load data from Parquet files into Neo4j.
+2.	Embedding Generation: Generate 256-dimensional embeddings based on node location information.
+3.	Clustering: Use the HDBSCAN model to cluster the embedded data and identify anomaly candidates.
+    - Form a feature matrix from embeddings and apply L2 normalization to ensure consistent distance computation.

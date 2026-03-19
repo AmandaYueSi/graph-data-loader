@@ -1,3 +1,8 @@
 neo4j
 pandas
 python-dotenv
+numpy
+scikit-learn
+hdbscan
+pyarrow
+umap-learn
