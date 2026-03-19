@@ -6,7 +6,8 @@ export const loggedInOwner: BusinessOwner = {
   title: "Director of Identity and Access Management",
   department: "Cybersecurity",
   domain: "IAM",
-  ownedApplications: ["SailPoint", "CyberArk", "Okta", "ServiceNow", "Active Directory"],
+  businessResponsibility:
+    "Responsible for identity and access management, access control, authentication systems, and governance of privileged access.",
 };
 
 export const entitlementMetadata: Record<string, EntitlementMeta> = {

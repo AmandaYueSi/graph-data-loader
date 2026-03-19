@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   AppBar,
@@ -25,16 +25,15 @@ import {
   ListItemText,
   MenuItem,
   Paper,
-  Select,
   Stack,
   Tab,
   Tabs,
+  TablePagination,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
 import {
-  AccountTree,
   Approval,
   CheckCircle,
   CompareArrows,
@@ -44,9 +43,17 @@ import {
   FilterList,
   Search,
 } from "@mui/icons-material";
-import { DataGrid, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import { entitlementMetadata, loggedInOwner, roleCandidates as seedCandidates } from "./mockData";
-import { EntitlementMeta, ReviewStatus, RoleCandidate } from "./types";
+import {
+  BusinessOwner,
+  BusinessOwnerApiProfile,
+  EntitlementMeta,
+  PagedResponse,
+  ReviewStatus,
+  RoleCandidate,
+  RoleCandidateApi,
+} from "./types";
 
 const statusColors: Record<ReviewStatus, "default" | "success" | "error" | "warning" | "info"> = {
   Pending: "warning",
@@ -56,33 +63,265 @@ const statusColors: Record<ReviewStatus, "default" | "success" | "error" | "warn
   "Needs Review": "info",
 };
 
-const tabs = ["Candidate Roles", "Entitlements", "Analytics / Graph View"];
+const tabs = ["Candidate Roles", "Entitlements"];
+const API_BASE_URL = "http://localhost:8080";
 
 function formatPercent(value: number) {
   return `${Math.round(value * 100)}%`;
 }
 
+function getEntitlementMeta(entitlementId: string): EntitlementMeta {
+  const existing = entitlementMetadata[entitlementId];
+  if (existing) {
+    return existing;
+  }
+
+  return {
+    id: entitlementId,
+    displayName: entitlementId,
+    application: "Unmapped Application",
+    sourceSystem: "Role Mining JSON",
+    description: "Metadata not yet loaded for this entitlement. Displaying the raw entitlement value from role_candidates_v1.json.",
+    sensitive: false,
+    risk: "Medium",
+  };
+}
+
 function groupEntitlements(entitlementIds: string[]) {
   return entitlementIds.reduce<Record<string, EntitlementMeta[]>>((acc, id) => {
-    const meta = entitlementMetadata[id];
+    const meta = getEntitlementMeta(id);
     const key = meta?.application ?? "Unknown";
     acc[key] = [...(acc[key] ?? []), meta];
     return acc;
   }, {});
 }
 
+function toUiStatus(status: RoleCandidateApi["status"]): ReviewStatus {
+  switch (status) {
+    case "APPROVED":
+      return "Approved";
+    case "REJECTED":
+      return "Rejected";
+    case "DRAFT":
+      return "Draft";
+    case "NEEDS_REVIEW":
+      return "Needs Review";
+    case "PENDING":
+    default:
+      return "Pending";
+  }
+}
+
+function mapRoleCandidate(apiCandidate: RoleCandidateApi): RoleCandidate {
+  const applications = [
+    ...new Set(
+      apiCandidate.entitlement_set
+        .map((entitlementId) => getEntitlementMeta(entitlementId).application)
+        .filter(Boolean),
+    ),
+  ] as string[];
+
+  return {
+    ...apiCandidate,
+    status: toUiStatus(apiCandidate.status),
+    domain: loggedInOwner.domain,
+    ownedApplications: applications,
+    notes: apiCandidate.review_metadata?.comment ?? apiCandidate.review_metadata?.reason ?? undefined,
+  };
+}
+
+function filterLocalCandidates(
+  source: RoleCandidate[],
+  filters: {
+    search: string;
+    statusFilter: ReviewStatus | "All";
+    departmentFilter: string;
+    locationFilter: string;
+    typeFilter: string;
+  },
+) {
+  return source.filter((candidate) => {
+    const matchesSearch =
+      !filters.search ||
+      candidate.role_name.toLowerCase().includes(filters.search.toLowerCase()) ||
+      candidate.role_candidate_id.toLowerCase().includes(filters.search.toLowerCase()) ||
+      candidate.entitlement_set.some((entitlement) =>
+        getEntitlementMeta(entitlement).displayName.toLowerCase().includes(filters.search.toLowerCase()),
+      );
+    const matchesStatus = filters.statusFilter === "All" || candidate.status === filters.statusFilter;
+    const matchesDepartment =
+      filters.departmentFilter === "All" || candidate.dominant_department === filters.departmentFilter;
+    const matchesLocation =
+      filters.locationFilter === "All" || candidate.dominant_location === filters.locationFilter;
+    const matchesType = filters.typeFilter === "All" || candidate.candidate_type === filters.typeFilter;
+    return matchesSearch && matchesStatus && matchesDepartment && matchesLocation && matchesType;
+  });
+}
+
+function toApiStatus(status: ReviewStatus | "All") {
+  if (status === "All") {
+    return "";
+  }
+  return status.toUpperCase().replace(/\s+/g, "_");
+}
+
 export default function App() {
-  const scopedSeed = seedCandidates.filter((candidate) => candidate.domain === loggedInOwner.domain);
-  const [candidates, setCandidates] = useState<RoleCandidate[]>(scopedSeed);
-  const [selectedId, setSelectedId] = useState<string>(scopedSeed[0]?.role_candidate_id ?? "");
+  const [owner, setOwner] = useState<BusinessOwner>(loggedInOwner);
+  const [ownerLoading, setOwnerLoading] = useState(true);
+  const [ownerError, setOwnerError] = useState<string>("");
+  const [candidates, setCandidates] = useState<RoleCandidate[]>(seedCandidates);
+  const [candidatesLoading, setCandidatesLoading] = useState(true);
+  const [candidatesError, setCandidatesError] = useState("");
+  const [totalCandidates, setTotalCandidates] = useState(seedCandidates.length);
+  const [selectedId, setSelectedId] = useState<string>(seedCandidates[0]?.role_candidate_id ?? "");
   const [tabIndex, setTabIndex] = useState(0);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<ReviewStatus | "All">("All");
   const [departmentFilter, setDepartmentFilter] = useState<string>("All");
   const [locationFilter, setLocationFilter] = useState<string>("All");
   const [typeFilter, setTypeFilter] = useState<string>("All");
+  const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 8 });
   const [compareTarget, setCompareTarget] = useState<RoleCandidate | null>(null);
   const [compareOpen, setCompareOpen] = useState(false);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadOwnerProfile() {
+      try {
+        setOwnerLoading(true);
+        const response = await fetch(`${API_BASE_URL}/api/me`, {
+          headers: {
+            "X-User-Id": loggedInOwner.ownerId,
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`Profile request failed with status ${response.status}`);
+        }
+
+        const data: BusinessOwnerApiProfile = await response.json();
+        if (ignore) {
+          return;
+        }
+
+        const nextOwner: BusinessOwner = {
+          ownerId: data.business_owner_id,
+          name: data.name,
+          title: data.title,
+          department: data.department,
+          domain: data.domain || loggedInOwner.domain,
+          businessResponsibility: data.business_responsibility,
+        };
+        setOwner(nextOwner);
+        setOwnerError("");
+      } catch (error) {
+        if (ignore) {
+          return;
+        }
+        setOwner(loggedInOwner);
+        setOwnerError(error instanceof Error ? error.message : "Failed to load business owner profile.");
+      } finally {
+        if (!ignore) {
+          setOwnerLoading(false);
+        }
+      }
+    }
+
+    loadOwnerProfile();
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    setPaginationModel((current) => ({ ...current, page: 0 }));
+  }, [search, statusFilter, departmentFilter, locationFilter, typeFilter]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadRoleCandidates() {
+      try {
+        setCandidatesLoading(true);
+        const params = new URLSearchParams({
+          page: String(paginationModel.page),
+          size: String(paginationModel.pageSize),
+        });
+        if (statusFilter !== "All") {
+          params.set("status", toApiStatus(statusFilter));
+        }
+        if (typeFilter !== "All") {
+          params.set("candidateType", typeFilter);
+        }
+        if (departmentFilter !== "All") {
+          params.set("department", departmentFilter);
+        }
+        if (locationFilter !== "All") {
+          params.set("location", locationFilter);
+        }
+        if (search.trim()) {
+          params.set("keyword", search.trim());
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/role-candidates?${params.toString()}`, {
+          headers: {
+            "X-User-Id": loggedInOwner.ownerId,
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`Role candidates request failed with status ${response.status}`);
+        }
+
+        const data: PagedResponse<RoleCandidateApi> = await response.json();
+        if (ignore) {
+          return;
+        }
+
+        const nextCandidates = data.content.map(mapRoleCandidate);
+        setCandidates(nextCandidates);
+        setTotalCandidates(data.total_elements);
+        setCandidatesError("");
+        setSelectedId((current) => {
+          if (nextCandidates.some((candidate) => candidate.role_candidate_id === current)) {
+            return current;
+          }
+          return nextCandidates[0]?.role_candidate_id ?? "";
+        });
+      } catch (error) {
+        if (ignore) {
+          return;
+        }
+        const locallyFiltered = filterLocalCandidates(seedCandidates, {
+          search,
+          statusFilter,
+          departmentFilter,
+          locationFilter,
+          typeFilter,
+        });
+        const fromIndex = paginationModel.page * paginationModel.pageSize;
+        const toIndex = fromIndex + paginationModel.pageSize;
+        const paged = locallyFiltered.slice(fromIndex, toIndex);
+        setCandidates(paged);
+        setTotalCandidates(locallyFiltered.length);
+        setCandidatesError(error instanceof Error ? error.message : "Failed to load role candidates.");
+        setSelectedId((current) => {
+          if (paged.some((candidate) => candidate.role_candidate_id === current)) {
+            return current;
+          }
+          return paged[0]?.role_candidate_id ?? "";
+        });
+      } finally {
+        if (!ignore) {
+          setCandidatesLoading(false);
+        }
+      }
+    }
+
+    loadRoleCandidates();
+    return () => {
+      ignore = true;
+    };
+  }, [departmentFilter, locationFilter, paginationModel.page, paginationModel.pageSize, search, statusFilter, typeFilter]);
 
   const selectedCandidate = candidates.find((candidate) => candidate.role_candidate_id === selectedId) ?? null;
 
@@ -95,27 +334,9 @@ export default function App() {
     [candidates],
   );
 
-  const filteredCandidates = useMemo(() => {
-    return candidates.filter((candidate) => {
-      const matchesSearch =
-        !search ||
-        candidate.role_name.toLowerCase().includes(search.toLowerCase()) ||
-        candidate.role_candidate_id.toLowerCase().includes(search.toLowerCase()) ||
-        candidate.entitlement_set.some((entitlement) =>
-          entitlementMetadata[entitlement]?.displayName.toLowerCase().includes(search.toLowerCase()),
-        );
-      const matchesStatus = statusFilter === "All" || candidate.status === statusFilter;
-      const matchesDepartment =
-        departmentFilter === "All" || candidate.dominant_department === departmentFilter;
-      const matchesLocation = locationFilter === "All" || candidate.dominant_location === locationFilter;
-      const matchesType = typeFilter === "All" || candidate.candidate_type === typeFilter;
-      return matchesSearch && matchesStatus && matchesDepartment && matchesLocation && matchesType;
-    });
-  }, [candidates, departmentFilter, locationFilter, search, statusFilter, typeFilter]);
-
   const entitlementStats = useMemo(() => {
     const counts = new Map<string, number>();
-    filteredCandidates.forEach((candidate) => {
+    candidates.forEach((candidate) => {
       candidate.entitlement_set.forEach((entitlement) => {
         counts.set(entitlement, (counts.get(entitlement) ?? 0) + 1);
       });
@@ -124,19 +345,19 @@ export default function App() {
       .map(([entitlementId, count]) => ({
         entitlementId,
         count,
-        meta: entitlementMetadata[entitlementId],
-        roles: filteredCandidates.filter((candidate) => candidate.entitlement_set.includes(entitlementId)),
+        meta: getEntitlementMeta(entitlementId),
+        roles: candidates.filter((candidate) => candidate.entitlement_set.includes(entitlementId)),
       }))
       .sort((a, b) => b.count - a.count);
-  }, [filteredCandidates]);
+  }, [candidates]);
 
   const summary = useMemo(() => {
     const totalEntitlements = new Set(candidates.flatMap((candidate) => candidate.entitlement_set)).size;
     const pending = candidates.filter((candidate) => candidate.status === "Pending" || candidate.status === "Needs Review").length;
     const approved = candidates.filter((candidate) => candidate.status === "Approved").length;
     const rejected = candidates.filter((candidate) => candidate.status === "Rejected").length;
-    return { totalEntitlements, pending, approved, rejected, totalRoles: candidates.length };
-  }, [candidates]);
+    return { totalEntitlements, pending, approved, rejected, totalRoles: totalCandidates };
+  }, [candidates, totalCandidates]);
 
   const updateCandidate = (candidateId: string, updater: (candidate: RoleCandidate) => RoleCandidate) => {
     setCandidates((current) => current.map((candidate) => (candidate.role_candidate_id === candidateId ? updater(candidate) : candidate)));
@@ -248,16 +469,21 @@ export default function App() {
           </Box>
           <Stack direction="row" spacing={2} alignItems="center">
             <Avatar sx={{ width: 56, height: 56, bgcolor: "secondary.main", color: "#fff4e4" }}>
-              {loggedInOwner.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}
+              {owner.name.split(" ").map((part) => part[0]).join("").slice(0, 2)}
             </Avatar>
             <Box>
               <Typography color="white" fontWeight={700}>
-                {loggedInOwner.name}
+                {ownerLoading ? "Loading profile..." : owner.name}
               </Typography>
-              <Typography color="rgba(255,255,255,0.78)">{loggedInOwner.title}</Typography>
+              <Typography color="rgba(255,255,255,0.78)">{owner.title}</Typography>
               <Typography color="rgba(255,255,255,0.6)" variant="body2">
-                Scope: {loggedInOwner.domain} • {loggedInOwner.ownedApplications.join(", ")}
+                {owner.department} • {owner.domain}
               </Typography>
+              {owner.businessResponsibility && (
+                <Typography color="rgba(255,255,255,0.55)" variant="body2">
+                  {owner.businessResponsibility}
+                </Typography>
+              )}
             </Box>
           </Stack>
         </Stack>
@@ -329,8 +555,13 @@ export default function App() {
               </TextField>
 
               <Alert severity="info" variant="outlined">
-                Only candidates aligned to {loggedInOwner.domain} ownership scope are visible in this workspace.
+                Only candidates aligned to {owner.domain} ownership scope are visible in this workspace.
               </Alert>
+              {ownerError && (
+                <Alert severity="warning" variant="outlined">
+                  Could not load `{API_BASE_URL}/api/me`. Showing fallback owner profile. {ownerError}
+                </Alert>
+              )}
             </Stack>
           </Paper>
         </Grid>
@@ -376,23 +607,32 @@ export default function App() {
                   </Typography>
                 </Box>
                 <Stack direction="row" spacing={1}>
-                  <Chip label={`${filteredCandidates.length} visible candidates`} color="primary" variant="outlined" />
+                  {candidatesLoading && <Chip label="Loading candidates..." color="info" variant="outlined" />}
+                  <Chip label={`${totalCandidates} matching candidates`} color="primary" variant="outlined" />
                   <Chip label={`${summary.pending} pending review`} color="warning" variant="outlined" />
                 </Stack>
               </Stack>
+              {candidatesError && (
+                <Alert severity="warning" sx={{ mx: 1.5, mb: 1 }}>
+                  Could not load candidates from `role_candidates_v1.json` via backend. Showing fallback mock data. {candidatesError}
+                </Alert>
+              )}
               <Box sx={{ height: 620 }}>
                 <DataGrid
-                  rows={filteredCandidates}
+                  rows={candidates}
                   columns={columns}
                   getRowId={(row) => row.role_candidate_id}
                   disableRowSelectionOnClick
+                  loading={candidatesLoading}
                   onRowClick={(params) => setSelectedId(params.row.role_candidate_id)}
+                  paginationMode="server"
+                  hideFooterPagination
+                  rowCount={totalCandidates}
+                  paginationModel={paginationModel}
+                  onPaginationModelChange={setPaginationModel}
                   initialState={{
                     sorting: {
                       sortModel: [{ field: "support_score", sort: "desc" }],
-                    },
-                    pagination: {
-                      paginationModel: { pageSize: 8, page: 0 },
                     },
                   }}
                   pageSizeOptions={[8, 16, 25]}
@@ -405,6 +645,21 @@ export default function App() {
                   }}
                 />
               </Box>
+              <Divider sx={{ my: 1.5 }} />
+              <TablePagination
+                component="div"
+                count={totalCandidates}
+                page={paginationModel.page}
+                onPageChange={(_, page) => setPaginationModel((current) => ({ ...current, page }))}
+                rowsPerPage={paginationModel.pageSize}
+                onRowsPerPageChange={(event) =>
+                  setPaginationModel({
+                    page: 0,
+                    pageSize: Number(event.target.value),
+                  })
+                }
+                rowsPerPageOptions={[8, 16, 25]}
+              />
             </Paper>
           )}
 
@@ -464,103 +719,6 @@ export default function App() {
             </Paper>
           )}
 
-          {tabIndex === 2 && selectedCandidate && (
-            <Paper sx={{ mt: 2, p: 2.5, border: "1px solid rgba(15,76,92,0.08)" }}>
-              <Stack direction={{ xs: "column", lg: "row" }} spacing={3}>
-                <Box sx={{ flex: 1.15 }}>
-                  <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1 }}>
-                    <AccountTree color="primary" />
-                    <Typography variant="h6">Role-to-Entitlement Relationship View</Typography>
-                  </Stack>
-                  <Typography color="text.secondary" sx={{ mb: 2 }}>
-                    A quick graph-style reading aid for analysts reviewing the selected role candidate.
-                  </Typography>
-
-                  <Paper
-                    sx={{
-                      p: 3,
-                      minHeight: 360,
-                      borderRadius: 5,
-                      background: "linear-gradient(180deg, rgba(15,76,92,0.07), rgba(255,255,255,0.82))",
-                    }}
-                  >
-                    <Stack alignItems="center" spacing={2}>
-                      <Chip
-                        label={selectedCandidate.role_name}
-                        color="primary"
-                        sx={{ px: 1.5, py: 3, fontWeight: 700, fontSize: 16 }}
-                      />
-                      <Divider flexItem sx={{ borderStyle: "dashed" }} />
-                      <Grid container spacing={1.5} justifyContent="center">
-                        {selectedCandidate.entitlement_set.map((entitlementId) => {
-                          const meta = entitlementMetadata[entitlementId];
-                          return (
-                            <Grid key={entitlementId} size={{ xs: 12, sm: 6 }}>
-                              <Paper sx={{ p: 1.5, borderRadius: 4, border: "1px solid rgba(15,76,92,0.08)" }}>
-                                <Typography fontWeight={700}>{meta.displayName}</Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                  {meta.application} • {meta.risk} risk
-                                </Typography>
-                              </Paper>
-                            </Grid>
-                          );
-                        })}
-                      </Grid>
-                    </Stack>
-                  </Paper>
-                </Box>
-
-                <Box sx={{ flex: 0.85 }}>
-                  <Typography variant="h6" sx={{ mb: 1 }}>
-                    Concentration Snapshot
-                  </Typography>
-                  <Stack spacing={2}>
-                    <Card sx={{ border: "1px solid rgba(16,42,51,0.08)" }}>
-                      <CardContent>
-                        <Typography variant="subtitle2" color="text.secondary">
-                          Support Strength
-                        </Typography>
-                        <Typography variant="h5" sx={{ mt: 1 }}>
-                          {formatPercent(selectedCandidate.support_score)}
-                        </Typography>
-                        <LinearProgress
-                          variant="determinate"
-                          value={selectedCandidate.support_score * 100}
-                          sx={{ mt: 1.5, height: 10, borderRadius: 999 }}
-                        />
-                      </CardContent>
-                    </Card>
-                    <Card sx={{ border: "1px solid rgba(16,42,51,0.08)" }}>
-                      <CardContent>
-                        <Typography variant="subtitle2" color="text.secondary">
-                          Department Focus
-                        </Typography>
-                        <Typography variant="h5" sx={{ mt: 1 }}>
-                          {selectedCandidate.dominant_department}
-                        </Typography>
-                        <Chip sx={{ mt: 1.5 }} label={selectedCandidate.dominant_job_title} />
-                      </CardContent>
-                    </Card>
-                    <Card sx={{ border: "1px solid rgba(16,42,51,0.08)" }}>
-                      <CardContent>
-                        <Typography variant="subtitle2" color="text.secondary">
-                          Review Risk
-                        </Typography>
-                        <Stack direction="row" spacing={1} sx={{ mt: 1.5 }}>
-                          {selectedCandidate.entitlement_set
-                            .map((id) => entitlementMetadata[id])
-                            .filter((item) => item.risk === "High")
-                            .map((item) => (
-                              <Chip key={item.id} label={item.displayName} color="error" size="small" />
-                            ))}
-                        </Stack>
-                      </CardContent>
-                    </Card>
-                  </Stack>
-                </Box>
-              </Stack>
-            </Paper>
-          )}
         </Grid>
       </Grid>
 
@@ -747,7 +905,9 @@ export default function App() {
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <Autocomplete
-              options={candidates.filter((candidate) => candidate.role_candidate_id !== selectedCandidate.role_candidate_id)}
+              options={candidates.filter(
+                (candidate) => candidate.role_candidate_id !== selectedCandidate?.role_candidate_id,
+              )}
               getOptionLabel={(option) => `${option.role_name} (${option.role_candidate_id})`}
               onChange={(_, value) => setCompareTarget(value)}
               renderInput={(params) => <TextField {...params} label="Compare with candidate" />}
@@ -766,7 +926,7 @@ export default function App() {
                       </Stack>
                       <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 2 }}>
                         {candidate.entitlement_set.map((id) => (
-                          <Chip key={id} label={entitlementMetadata[id].displayName} />
+                          <Chip key={id} label={getEntitlementMeta(id).displayName} />
                         ))}
                       </Stack>
                     </Paper>
