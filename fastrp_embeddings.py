@@ -1,9 +1,9 @@
 import argparse
 import os
-from typing import Iterable
 
 from dotenv import load_dotenv
-from neo4j import GraphDatabase
+
+from fastrp_embeddings import FastRPEmbedder, parse_csv
 
 
 DEFAULT_NODE_LABELS = [
@@ -13,6 +13,7 @@ DEFAULT_NODE_LABELS = [
     "Application",
     "Resource",
     "EntitlementGroup",
+    "BusinessOwner",
 ]
 
 DEFAULT_RELATIONSHIP_TYPES = [
@@ -23,130 +24,17 @@ DEFAULT_RELATIONSHIP_TYPES = [
     "MEMBER_OF_GROUP",
     "CONTAINS_ENTITLEMENT",
     "HAS_CHILD_GROUP",
+    "OWNED_BY",
 ]
-
-
-def parse_csv(value: str | None, default: Iterable[str]) -> list[str]:
-    if not value:
-        return list(default)
-    return [item.strip() for item in value.split(",") if item.strip()]
-
-
-class FastRPEmbedder:
-    def __init__(self, uri: str, user: str, password: str):
-        self.driver = GraphDatabase.driver(uri, auth=(user, password))
-
-    def close(self) -> None:
-        self.driver.close()
-
-    def verify_gds(self) -> None:
-        required_procedures = [
-            "gds.graph.project",
-            "gds.fastRP.write",
-        ]
-        query = """
-        SHOW PROCEDURES YIELD name
-        WHERE name IN $required_procedures
-        RETURN collect(name) AS available
-        """
-        with self.driver.session() as session:
-            record = session.run(
-                query,
-                required_procedures=required_procedures,
-            ).single()
-
-        available = set(record["available"])
-        missing = [name for name in required_procedures if name not in available]
-        if missing:
-            raise RuntimeError(
-                "Neo4j Graph Data Science procedures are unavailable: "
-                + ", ".join(missing)
-                + ". Install or enable the GDS plugin before running FastRP."
-            )
-
-    def drop_projection_if_exists(self, graph_name: str) -> None:
-        query = """
-        CALL gds.graph.exists($graph_name) YIELD exists
-        WITH exists, $graph_name AS gName
-        CALL (exists, gName) {
-            WITH exists, gName
-            WITH exists WHERE exists
-            CALL gds.graph.drop(gName, false) YIELD graphName
-            RETURN graphName
-            UNION
-            WITH exists
-            WITH exists WHERE NOT exists
-            RETURN null AS graphName
-        }
-        RETURN graphName
-        """
-        with self.driver.session() as session:
-            session.run(query, graph_name=graph_name).consume()
-
-    def create_projection(
-        self,
-        graph_name: str,
-        node_labels: list[str],
-        relationship_types: list[str],
-    ) -> dict:
-        query = """
-        CALL gds.graph.project(
-            $graph_name,
-            $node_labels,
-            $relationship_types
-        )
-        YIELD graphName, nodeCount, relationshipCount
-        RETURN graphName, nodeCount, relationshipCount
-        """
-        with self.driver.session() as session:
-            record = session.run(
-                query,
-                graph_name=graph_name,
-                node_labels=node_labels,
-                relationship_types=relationship_types,
-            ).single()
-        return dict(record)
-
-    def write_embeddings(
-        self,
-        graph_name: str,
-        embedding_property: str,
-        embedding_dimension: int,
-        iteration_weights: list[float],
-        normalization_strength: float,
-    ) -> dict:
-        query = """
-        CALL gds.fastRP.write(
-            $graph_name,
-            {
-                writeProperty: $embedding_property,
-                embeddingDimension: $embedding_dimension,
-                iterationWeights: $iteration_weights,
-                normalizationStrength: $normalization_strength
-            }
-        )
-        YIELD nodePropertiesWritten, preProcessingMillis, computeMillis, writeMillis
-        RETURN nodePropertiesWritten, preProcessingMillis, computeMillis, writeMillis
-        """
-        with self.driver.session() as session:
-            record = session.run(
-                query,
-                graph_name=graph_name,
-                embedding_property=embedding_property,
-                embedding_dimension=embedding_dimension,
-                iteration_weights=iteration_weights,
-                normalization_strength=normalization_strength,
-            ).single()
-        return dict(record)
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Create Neo4j FastRP embeddings and write them back to node properties."
+        description="Create FastRP embeddings across the full IAM graph, including business owners."
     )
     parser.add_argument(
         "--graph-name",
-        default="iam-fastrp",
+        default="iam-all-nodes-fastrp",
         help="Name of the in-memory GDS graph projection.",
     )
     parser.add_argument(
@@ -161,7 +49,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--embedding-property",
-        default="fastrp_embedding",
+        default="embedding",
         help="Node property name used to store the embedding vector.",
     )
     parser.add_argument(

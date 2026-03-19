@@ -1,0 +1,19 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
+
+:root {
+  color: #102a33;
+  background:
+    radial-gradient(circle at top right, rgba(209, 122, 34, 0.14), transparent 28%),
+    radial-gradient(circle at left center, rgba(15, 76, 92, 0.12), transparent 34%),
+    linear-gradient(180deg, #f7f2e8 0%, #f4f1ea 100%);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}

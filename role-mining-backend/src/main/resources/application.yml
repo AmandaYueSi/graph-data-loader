@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: role-mining-backend
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+server:
+  port: 8080
+
+app:
+  security:
+    default-user-id: "11111111-1111-1111-1111-111111111111"
+  data:
+    role-candidates-path: "${ROLE_CANDIDATES_PATH:../role_candidates_v1.json}"
+    review-overlays-path: "${ROLE_CANDIDATE_REVIEWS_PATH:data/role-candidate-reviews.json}"
+    ownership-scoping-enabled: false
+  neo4j:
+    uri: "${NEO4J_URI:neo4j://127.0.0.1:7687}"
+    username: "${NEO4J_USERNAME:neo4j}"
+    password: "${NEO4J_PASSWORD:your_password}"
