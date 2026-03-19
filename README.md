@@ -53,6 +53,48 @@ python hdbscan_anomaly_pipeline.py \
   --anomaly-percentile 99
 ```
 
+Generate entitlement-only clusters from identity/account/entitlement relationships:
+```bash
+python cluster_entitlement_packages.py \
+  --data-dir iam_dataset_new \
+  --output-path entitlement_clusters.json
+```
+
+Recommend the top 3 entitlement clusters for a random new joiner based on similar colleagues:
+```bash
+python recommend_clusters_for_random_joiner.py \
+  --data-dir iam_dataset_new \
+  --clusters-path entitlement_clusters.json \
+  --output-path random_joiner_recommendations.json
+```
+
+Generate role names and descriptions for entitlement clusters using LLM:
+```bash
+# Using OpenAI (default, requires OPENAI_API_KEY in .env)
+python role_miner.py \
+  --input-path entitlement_clusters.json \
+  --output-path entitlement_roles.json \
+  --provider openai
+
+# Using Anthropic Claude (requires ANTHROPIC_API_KEY in .env)
+python role_miner.py \
+  --input-path entitlement_clusters.json \
+  --output-path entitlement_roles.json \
+  --provider anthropic \
+  --model claude-3-5-sonnet-20241022
+
+# Using local Ollama instance (requires Ollama running locally)
+python role_miner.py \
+  --input-path entitlement_clusters.json \
+  --output-path entitlement_roles.json \
+  --provider ollama \
+  --model mistral
+```
+
 Prerequisites:
 - Your Neo4j instance must have the Graph Data Science library installed.
 - `NEO4J_URI`, `NEO4J_USERNAME`, and `NEO4J_PASSWORD` should be available in `.env`.
+- For LLM-based role mining, add the appropriate API key to `.env`:
+  - `OPENAI_API_KEY` for OpenAI
+  - `ANTHROPIC_API_KEY` for Anthropic Claude
+  - `OLLAMA_BASE_URL` for local Ollama (defaults to `http://localhost:11434`)

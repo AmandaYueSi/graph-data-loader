@@ -1,0 +1,287 @@
+{
+  "new_joiner": {
+    "identity_id": "b6e03a72-4638-44ca-b474-6607849f92cb",
+    "identity_type": "Human",
+    "status": "Active",
+    "department": "Product",
+    "job_title": "Product Manager",
+    "location": "Kevinshire",
+    "manager_id": "ff202173-c479-421d-979d-ad04d3512e51"
+  },
+  "colleague_count_used": 25,
+  "colleagues": [
+    {
+      "identity_id": "002b2911-c014-4d2e-9c6d-522fac39f3ed",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Port Danielmouth",
+      "manager_id": "44ed1f36-00fe-4e6c-b5cc-1e8fc0e43aa1",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "0196b93f-d819-4370-91e7-0c1becbfb37d",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Mejiaport",
+      "manager_id": "7ebd4a41-13dd-45cf-8b13-199abcb6f217",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "0c7e2456-8cd8-4bc5-bf64-0b1a34a72b98",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Barbaramouth",
+      "manager_id": "b59e649a-60a1-4a7e-828c-77852f7c3305",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "0c984525-a605-4070-978e-b3b31c8f0c5f",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "South Monicafurt",
+      "manager_id": null,
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "0d3fc94a-b0c2-4112-8a9a-209e518f5c67",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "West Carlatown",
+      "manager_id": "98524196-f660-4748-bd13-3778b5eb753a",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "10b17953-ddcf-435b-90d0-e309ac4b1958",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Hughesfurt",
+      "manager_id": "05569ee0-80dd-46d4-99cb-ea565683c1c4",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "10dfb40c-5078-4713-8b4b-ce5fb49f9d20",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Port Christopher",
+      "manager_id": "0877efa3-b79d-44a5-b2c6-41b7c2c9c7a5",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "11c7142d-59e6-4748-8d42-07ad25908849",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Samanthafort",
+      "manager_id": "20918449-31fb-4bae-a263-76d086ba7b7a",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "1aaf13e9-1909-479d-b732-6105eb451488",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Smithberg",
+      "manager_id": "ee56f6a8-85b8-421b-afbf-14b4be939b1c",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "1b760556-7c27-44a6-8ba3-9ba7f46b9ae4",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Port Dominiqueview",
+      "manager_id": "b5de6267-89d4-4763-af4c-6ffe8e3d8803",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "1cb8fb51-19e0-4a1a-80df-73a4031f7a3a",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "South Amandafort",
+      "manager_id": null,
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "1d6301be-d5a8-4198-b750-e2788cb90b3e",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Cassandraton",
+      "manager_id": "a3e08975-6407-4844-8d7c-44310b351784",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "1e8c8516-0e40-46ac-a319-c81f6bcda378",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "South Eric",
+      "manager_id": "8010312a-2451-48dd-9dcd-63acadb2a6f4",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "20e9c09c-4d59-409f-ac88-77f9ad7158e5",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Lake Kimberly",
+      "manager_id": "2770d85e-4376-462a-b41b-cbd6997f6344",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "245098d3-ab58-4d74-b566-980217a2c36e",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "East Brandontown",
+      "manager_id": "dc2306e8-beba-4b12-892c-dc27adaac94e",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "2597d9cd-b71b-49b0-9091-d43baeb56dae",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Mckenziemouth",
+      "manager_id": "be7e18ec-f3e2-4e57-a256-612477a799b2",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "29b330ad-3a36-49f2-bbcf-57791f6a095e",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "South Conniemouth",
+      "manager_id": "b63804d1-0440-40f9-abbc-c1be69302b52",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "2a0aa94c-d8fa-4c1a-a97e-43e97dd409f9",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Howellside",
+      "manager_id": "c5e39b35-947a-4a8c-b2de-f28784f30e16",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "2a77fd7c-1fb3-41ce-8aa9-d0a0a0201ab9",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Woodburgh",
+      "manager_id": null,
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "2b2e7734-5288-4377-9788-26b8779ff72d",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Meyersfort",
+      "manager_id": "3250538d-2a3e-49df-bcd3-78fc720f43b6",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "2c4cc734-bda5-406b-ad60-5ef962438bfe",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "New Ryan",
+      "manager_id": "f8d62a04-f070-4013-84bb-fc7a50491c82",
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "2cc5c1fd-c562-41fc-a030-a3f2df557a76",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Johnsontown",
+      "manager_id": null,
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "2ecc4a67-4702-415e-921a-d9fef52ee486",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Lake Christopher",
+      "manager_id": null,
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "2f4be37b-c8d0-4ba8-a795-cb5c0a3f1532",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Philipshire",
+      "manager_id": null,
+      "similarity_score": 7
+    },
+    {
+      "identity_id": "32d5a415-688d-4879-96ca-4c92ec8502e4",
+      "department": "Product",
+      "job_title": "Product Manager",
+      "location": "Port Christopherport",
+      "manager_id": "ca6eb2d3-a4b1-41d2-9c66-6ea87c78ab7c",
+      "similarity_score": 7
+    }
+  ],
+  "top_cluster_recommendations": [
+    {
+      "cluster_id": "cluster_13",
+      "score": 2.0,
+      "colleagues_covered": 25,
+      "cluster_size": 8,
+      "matched_entitlements": [
+        "Ent_HARD_3454",
+        "Ent_MOVEMENT_3881",
+        "Ent_SCENE_6430",
+        "Ent_SON_1438",
+        "Ent_SYSTEM_7334",
+        "Ent_TEAM_8604",
+        "Ent_TEND_1973",
+        "Ent_TWO_4669"
+      ],
+      "recommended_entitlements": [
+        "Ent_HARD_3454",
+        "Ent_MOVEMENT_3881",
+        "Ent_SCENE_6430",
+        "Ent_SON_1438",
+        "Ent_SYSTEM_7334",
+        "Ent_TEAM_8604",
+        "Ent_TEND_1973",
+        "Ent_TWO_4669"
+      ]
+    },
+    {
+      "cluster_id": "cluster_20",
+      "score": 2.0,
+      "colleagues_covered": 25,
+      "cluster_size": 6,
+      "matched_entitlements": [
+        "Ent_HEART_3023",
+        "Ent_JOIN_8793",
+        "Ent_MATTER_1311",
+        "Ent_PARTNER_7662",
+        "Ent_SIX_9219",
+        "Ent_SUGGEST_4845"
+      ],
+      "recommended_entitlements": [
+        "Ent_HEART_3023",
+        "Ent_JOIN_8793",
+        "Ent_MATTER_1311",
+        "Ent_PARTNER_7662",
+        "Ent_SIX_9219",
+        "Ent_SUGGEST_4845"
+      ]
+    },
+    {
+      "cluster_id": "cluster_40",
+      "score": 0.1233,
+      "colleagues_covered": 1,
+      "cluster_size": 12,
+      "matched_entitlements": [
+        "Ent_HAVE_9003"
+      ],
+      "recommended_entitlements": [
+        "Ent_BEGIN_8798",
+        "Ent_CARD_5037",
+        "Ent_COUNTRY_5364",
+        "Ent_ENERGY_6170",
+        "Ent_FATHER_1791",
+        "Ent_HAVE_9003",
+        "Ent_ITS_3405",
+        "Ent_JOB_8870",
+        "Ent_LARGE_9380",
+        "Ent_LIFE_4249",
+        "Ent_POOR_9833",
+        "Ent_SUCH_7098"
+      ]
+    }
+  ]
+}

@@ -1,4 +1,13 @@
 1.	Data Loading: Load data from Parquet files into Neo4j.
-2.	Embedding Generation: Generate 256-dimensional embeddings based on node location information.
+2.	FastRP: FastRP is a way to turn each node in a graph into a list of numbers called an embedding. 
+Those numbers help capture how that node is connected to the rest of the graph. It starts by giving each node a random vector. 
+Then it repeatedly mixes in information from nearby nodes, so over time each node’s vector reflects its local graph structure. 
+After a few rounds, nodes with similar connection patterns end up with similar embeddings.
+
+In your case, that means identities, accounts, and entitlements that are connected in similar ways 
+will get similar vectors, which makes clustering and recommendation much easier.
+
+
+
 3.	Clustering: Use the HDBSCAN model to cluster the embedded data and identify anomaly candidates.
     - Form a feature matrix from embeddings and apply L2 normalization to ensure consistent distance computation.

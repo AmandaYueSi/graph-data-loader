@@ -1,0 +1,727 @@
+[
+  {
+    "cluster_id": "cluster_0",
+    "entitlements": [
+      "Ent_ADULT_4754",
+      "Ent_AMERICAN_4527",
+      "Ent_BOARD_5612",
+      "Ent_CHOOSE_7681",
+      "Ent_DEAL_8528",
+      "Ent_ENERGY_1086",
+      "Ent_FIGHT_2069",
+      "Ent_INSTEAD_8030",
+      "Ent_LINE_9160",
+      "Ent_MANY_4212",
+      "Ent_MEETING_2751",
+      "Ent_MINUTE_5365",
+      "Ent_MY_7473",
+      "Ent_OTHER_3712",
+      "Ent_PEACE_2399",
+      "Ent_PICK_5837",
+      "Ent_POWER_7310",
+      "Ent_ROOM_9122",
+      "Ent_SCORE_2882",
+      "Ent_SINCE_3819",
+      "Ent_SPRING_2685",
+      "Ent_TALK_6273",
+      "Ent_TASK_3248",
+      "Ent_TODAY_3715",
+      "Ent_TO_1573",
+      "Ent_TRUTH_6909"
+    ]
+  },
+  {
+    "cluster_id": "cluster_1",
+    "entitlements": [
+      "Ent_ABLE_8178",
+      "Ent_BUDGET_6897",
+      "Ent_BUY_4374",
+      "Ent_BUY_9086",
+      "Ent_CAREER_6148",
+      "Ent_FEAR_3395",
+      "Ent_FINAL_9495",
+      "Ent_FULL_8812",
+      "Ent_HEAVY_1148",
+      "Ent_LESS_4007",
+      "Ent_PICTURE_7870",
+      "Ent_POLITICS_3090",
+      "Ent_PRODUCTION_8489",
+      "Ent_SCORE_4258",
+      "Ent_THAT_2831"
+    ]
+  },
+  {
+    "cluster_id": "cluster_2",
+    "entitlements": [
+      "Ent_AGREE_3825",
+      "Ent_ALTHOUGH_8248",
+      "Ent_AS_6999",
+      "Ent_COMMON_5032",
+      "Ent_COUPLE_5077",
+      "Ent_DAUGHTER_6219",
+      "Ent_DETAIL_2293",
+      "Ent_GENERAL_9418",
+      "Ent_HEAD_6220",
+      "Ent_LONG_3240",
+      "Ent_ONLY_8901",
+      "Ent_PERSONAL_2197",
+      "Ent_SECTION_4537",
+      "Ent_SKIN_6032",
+      "Ent_STUFF_4614",
+      "Ent_SUMMER_9064",
+      "Ent_SUPPORT_1266"
+    ]
+  },
+  {
+    "cluster_id": "cluster_3",
+    "entitlements": [
+      "Ent_AFTER_1029",
+      "Ent_ART_9189",
+      "Ent_BALL_9567",
+      "Ent_COUPLE_5493",
+      "Ent_LAST_2874",
+      "Ent_MEETING_8555",
+      "Ent_REFLECT_6665",
+      "Ent_STATE_6078",
+      "Ent_SUFFER_8811",
+      "Ent_TOO_4495",
+      "Ent_TREE_4703",
+      "Ent_TRIP_2905"
+    ]
+  },
+  {
+    "cluster_id": "cluster_4",
+    "entitlements": [
+      "Ent_BUDGET_9397",
+      "Ent_DIRECTOR_2598",
+      "Ent_FIGURE_5535",
+      "Ent_FIND_4552",
+      "Ent_FREE_7463",
+      "Ent_MOVIE_5642",
+      "Ent_POSSIBLE_7721",
+      "Ent_PRESSURE_3631",
+      "Ent_PROCESS_5804",
+      "Ent_START_8490",
+      "Ent_THIS_1402",
+      "Ent_WALL_1977"
+    ]
+  },
+  {
+    "cluster_id": "cluster_5",
+    "entitlements": [
+      "Ent_DREAM_1220",
+      "Ent_ENJOY_5262",
+      "Ent_FLY_7504",
+      "Ent_HOSPITAL_8089",
+      "Ent_KID_3020",
+      "Ent_LISTEN_7460",
+      "Ent_OFFICE_8080",
+      "Ent_PASS_7350",
+      "Ent_SIMILAR_3507",
+      "Ent_START_1226",
+      "Ent_SUPPORT_1442",
+      "Ent_TREATMENT_8874",
+      "Ent_YEAH_2423"
+    ]
+  },
+  {
+    "cluster_id": "cluster_6",
+    "entitlements": [
+      "Ent_ARRIVE_5352",
+      "Ent_BORN_3096",
+      "Ent_CULTURAL_4664",
+      "Ent_DOOR_7405",
+      "Ent_EVERYONE_8707",
+      "Ent_GIRL_3275",
+      "Ent_GROWTH_6628",
+      "Ent_GUN_4823",
+      "Ent_OFFICER_7488",
+      "Ent_SIMILAR_2478",
+      "Ent_SMALL_7851",
+      "Ent_THERE_4185",
+      "Ent_THROUGH_9620",
+      "Ent_WALK_4113",
+      "Ent_WIN_7666"
+    ]
+  },
+  {
+    "cluster_id": "cluster_7",
+    "entitlements": [
+      "Ent_CALL_8173",
+      "Ent_CITY_7644",
+      "Ent_CLEAR_3681",
+      "Ent_ELSE_1391",
+      "Ent_HAPPY_4942",
+      "Ent_HIT_9871",
+      "Ent_INTEREST_4827",
+      "Ent_ISSUE_3843",
+      "Ent_NEWSPAPER_7571",
+      "Ent_PHYSICAL_5922",
+      "Ent_POWER_7394",
+      "Ent_SCENE_7712",
+      "Ent_SEE_1911",
+      "Ent_TAKE_7189",
+      "Ent_THESE_6534",
+      "Ent_THEY_3250",
+      "Ent_WATCH_9325",
+      "Ent_YEAR_5156"
+    ]
+  },
+  {
+    "cluster_id": "cluster_8",
+    "entitlements": [
+      "Ent_ABLE_2688",
+      "Ent_ACTIVITY_2943",
+      "Ent_CARD_2934",
+      "Ent_GOAL_6720",
+      "Ent_HIGH_9124",
+      "Ent_INDUSTRY_5219",
+      "Ent_INVESTMENT_5113",
+      "Ent_LIKELY_4169",
+      "Ent_LOSE_3141",
+      "Ent_MATERIAL_6183",
+      "Ent_MEMBER_4838",
+      "Ent_MODEL_7643",
+      "Ent_PIECE_6445",
+      "Ent_PLAYER_6906",
+      "Ent_PRACTICE_9503",
+      "Ent_READY_9541",
+      "Ent_RED_1765",
+      "Ent_SINCE_9054",
+      "Ent_SPACE_9417",
+      "Ent_THEORY_2464",
+      "Ent_TOO_1969",
+      "Ent_USE_7278",
+      "Ent_WATCH_3396"
+    ]
+  },
+  {
+    "cluster_id": "cluster_9",
+    "entitlements": [
+      "Ent_ALL_2737",
+      "Ent_APPROACH_7865",
+      "Ent_ARM_4320",
+      "Ent_BENEFIT_3489",
+      "Ent_CAN_2660",
+      "Ent_COMPANY_8710",
+      "Ent_ECONOMY_7695",
+      "Ent_ENOUGH_3240",
+      "Ent_LANGUAGE_2529",
+      "Ent_MORE_6708",
+      "Ent_SONG_4883"
+    ]
+  },
+  {
+    "cluster_id": "cluster_10",
+    "entitlements": [
+      "Ent_CANDIDATE_2191",
+      "Ent_CARD_1464",
+      "Ent_CAUSE_3784",
+      "Ent_CHALLENGE_3558",
+      "Ent_DAUGHTER_3461",
+      "Ent_DEFENSE_4914",
+      "Ent_GROUP_3077",
+      "Ent_HAVE_7645",
+      "Ent_INTEREST_7914",
+      "Ent_LAUGH_8684",
+      "Ent_PRODUCT_4309",
+      "Ent_REPUBLICAN_3117",
+      "Ent_SERVE_8904",
+      "Ent_SIGN_4484",
+      "Ent_SOLDIER_5014",
+      "Ent_STAND_6947",
+      "Ent_VOTE_8303"
+    ]
+  },
+  {
+    "cluster_id": "cluster_11",
+    "entitlements": [
+      "Ent_ARRIVE_9276",
+      "Ent_ATTENTION_8787",
+      "Ent_BILLION_5325",
+      "Ent_BUDGET_7690",
+      "Ent_DRUG_5417",
+      "Ent_EXPERIENCE_2771",
+      "Ent_FORMER_8856",
+      "Ent_FRONT_9103",
+      "Ent_INDIVIDUAL_3068",
+      "Ent_ITSELF_5174",
+      "Ent_KNOW_3901",
+      "Ent_NEWS_9330",
+      "Ent_OFF_8735",
+      "Ent_RETURN_2203",
+      "Ent_SUGGEST_8341",
+      "Ent_TRIP_3861",
+      "Ent_TRUTH_2844",
+      "Ent_WAR_1518"
+    ]
+  },
+  {
+    "cluster_id": "cluster_12",
+    "entitlements": [
+      "Ent_BEYOND_6043",
+      "Ent_CARD_3472",
+      "Ent_CLAIM_5796",
+      "Ent_CUP_3847",
+      "Ent_FAMILY_1768",
+      "Ent_FIGURE_9240",
+      "Ent_HIMSELF_5142",
+      "Ent_HOT_8334",
+      "Ent_MILITARY_3795",
+      "Ent_PREPARE_4579",
+      "Ent_SEAT_9062",
+      "Ent_STREET_6164",
+      "Ent_THROW_2256",
+      "Ent_YET_7830"
+    ]
+  },
+  {
+    "cluster_id": "cluster_13",
+    "entitlements": [
+      "Ent_HARD_3454",
+      "Ent_MOVEMENT_3881",
+      "Ent_SCENE_6430",
+      "Ent_SON_1438",
+      "Ent_SYSTEM_7334",
+      "Ent_TEAM_8604",
+      "Ent_TEND_1973",
+      "Ent_TWO_4669"
+    ]
+  },
+  {
+    "cluster_id": "cluster_14",
+    "entitlements": [
+      "Ent_ACCOUNT_8181",
+      "Ent_ACCOUNT_8374",
+      "Ent_COUPLE_3671",
+      "Ent_ELSE_5030",
+      "Ent_ITSELF_6067",
+      "Ent_LET_4128",
+      "Ent_LIFE_6489",
+      "Ent_MISS_4583",
+      "Ent_NEW_5891",
+      "Ent_SINGLE_1909",
+      "Ent_SMALL_6682",
+      "Ent_SMILE_6862",
+      "Ent_SOMETHING_1237",
+      "Ent_SPECIAL_9933"
+    ]
+  },
+  {
+    "cluster_id": "cluster_15",
+    "entitlements": [
+      "Ent_ACROSS_5695",
+      "Ent_BAG_2708",
+      "Ent_CENTRAL_7768",
+      "Ent_CULTURAL_5563",
+      "Ent_EDUCATION_7714",
+      "Ent_FINANCIAL_9913",
+      "Ent_FOOD_4129",
+      "Ent_FOREIGN_4561",
+      "Ent_LAWYER_3062",
+      "Ent_LAY_1722",
+      "Ent_LEADER_5307",
+      "Ent_MATTER_2467",
+      "Ent_MONEY_7091",
+      "Ent_NATIONAL_1923",
+      "Ent_SPRING_2623",
+      "Ent_THOUSAND_8597",
+      "Ent_UP_1084",
+      "Ent_VISIT_8235"
+    ]
+  },
+  {
+    "cluster_id": "cluster_16",
+    "entitlements": [
+      "Ent_ALL_6358",
+      "Ent_ANYONE_9190",
+      "Ent_CONCERN_3147",
+      "Ent_EIGHT_5178",
+      "Ent_FOREIGN_5396",
+      "Ent_GENERATION_7041",
+      "Ent_MUSIC_1181",
+      "Ent_RAISE_4238",
+      "Ent_SHOULD_5680",
+      "Ent_SORT_5576",
+      "Ent_SPACE_9559",
+      "Ent_TEAM_1470",
+      "Ent_THEM_7581",
+      "Ent_THREAT_3779",
+      "Ent_THROUGH_3519",
+      "Ent_THUS_8934"
+    ]
+  },
+  {
+    "cluster_id": "cluster_17",
+    "entitlements": [
+      "Ent_CANDIDATE_8769",
+      "Ent_CHECK_8567",
+      "Ent_FINANCIAL_6254",
+      "Ent_GAS_5406",
+      "Ent_GROUND_3486",
+      "Ent_GROUND_5597",
+      "Ent_GUN_1027",
+      "Ent_HEAR_7986",
+      "Ent_HIM_4045",
+      "Ent_MEET_9946",
+      "Ent_MISSION_3356",
+      "Ent_MOTHER_7514",
+      "Ent_NATION_9507",
+      "Ent_PEACE_4429",
+      "Ent_PRESSURE_9047",
+      "Ent_PRODUCT_1559",
+      "Ent_SELL_1788",
+      "Ent_THROUGH_4376",
+      "Ent_TOWARD_8057",
+      "Ent_WOMAN_4091",
+      "Ent_WRITE_4995"
+    ]
+  },
+  {
+    "cluster_id": "cluster_18",
+    "entitlements": [
+      "Ent_CANDIDATE_5250",
+      "Ent_CLASS_2339",
+      "Ent_COLD_5149",
+      "Ent_DEAL_8566",
+      "Ent_DOG_3891",
+      "Ent_EVIDENCE_8509",
+      "Ent_LAST_6258",
+      "Ent_LEAST_9705",
+      "Ent_MAIN_1285",
+      "Ent_RICH_7275",
+      "Ent_SINCE_2821",
+      "Ent_STAY_1157",
+      "Ent_WAR_1101",
+      "Ent_WHICH_8221"
+    ]
+  },
+  {
+    "cluster_id": "cluster_19",
+    "entitlements": [
+      "Ent_ANY_5856",
+      "Ent_BASE_8574",
+      "Ent_DIFFICULT_6208",
+      "Ent_DISCUSS_9300",
+      "Ent_EACH_3470",
+      "Ent_EAT_9068",
+      "Ent_FINALLY_9324",
+      "Ent_FOUR_4277",
+      "Ent_NO_5132",
+      "Ent_PICTURE_3966",
+      "Ent_SOUTH_4394",
+      "Ent_START_1291",
+      "Ent_STOP_4287",
+      "Ent_TELL_4507",
+      "Ent_WITHOUT_8399",
+      "Ent_YEAR_3052"
+    ]
+  },
+  {
+    "cluster_id": "cluster_20",
+    "entitlements": [
+      "Ent_HEART_3023",
+      "Ent_JOIN_8793",
+      "Ent_MATTER_1311",
+      "Ent_PARTNER_7662",
+      "Ent_SIX_9219",
+      "Ent_SUGGEST_4845"
+    ]
+  },
+  {
+    "cluster_id": "cluster_21",
+    "entitlements": [
+      "Ent_ACTIVITY_7319",
+      "Ent_DIRECTOR_8967",
+      "Ent_DOOR_5010",
+      "Ent_DRUG_1463",
+      "Ent_EFFECT_9090",
+      "Ent_GIVE_7709",
+      "Ent_LONG_1885",
+      "Ent_MILITARY_1498",
+      "Ent_NOTE_3215",
+      "Ent_PUBLIC_6351",
+      "Ent_THROW_9356",
+      "Ent_VIEW_4063"
+    ]
+  },
+  {
+    "cluster_id": "cluster_22",
+    "entitlements": [
+      "Ent_DAUGHTER_9234",
+      "Ent_EXPLAIN_5838",
+      "Ent_FIVE_7833",
+      "Ent_MAJOR_3357",
+      "Ent_PHONE_3728",
+      "Ent_SCENE_5946",
+      "Ent_SUMMER_2008",
+      "Ent_US_6760"
+    ]
+  },
+  {
+    "cluster_id": "cluster_23",
+    "entitlements": [
+      "Ent_BETTER_9770",
+      "Ent_FLOOR_1623",
+      "Ent_GIVE_8198",
+      "Ent_HOSPITAL_7934",
+      "Ent_INTEREST_5059",
+      "Ent_WHEN_6565"
+    ]
+  },
+  {
+    "cluster_id": "cluster_24",
+    "entitlements": [
+      "Ent_ABOUT_1069",
+      "Ent_ARGUE_3302",
+      "Ent_EVIDENCE_6084",
+      "Ent_GREEN_2176",
+      "Ent_LEAVE_2396",
+      "Ent_REACH_6642",
+      "Ent_RESPONSE_2497",
+      "Ent_SOUND_6570"
+    ]
+  },
+  {
+    "cluster_id": "cluster_25",
+    "entitlements": [
+      "Ent_HIMSELF_6463",
+      "Ent_KEEP_1091",
+      "Ent_LIKELY_8695",
+      "Ent_PEACE_8604",
+      "Ent_RISE_5291",
+      "Ent_STANDARD_3122",
+      "Ent_STRONG_8721"
+    ]
+  },
+  {
+    "cluster_id": "cluster_26",
+    "entitlements": [
+      "Ent_HIS_2702",
+      "Ent_LINE_3415",
+      "Ent_PROGRAM_8793",
+      "Ent_PROVIDE_1412",
+      "Ent_SIX_2552",
+      "Ent_SUCH_2392",
+      "Ent_TEN_1299"
+    ]
+  },
+  {
+    "cluster_id": "cluster_27",
+    "entitlements": [
+      "Ent_ADULT_5012",
+      "Ent_BRING_8705",
+      "Ent_INSIDE_2791",
+      "Ent_LEAD_1550",
+      "Ent_NOW_4042",
+      "Ent_PAINTING_1744",
+      "Ent_POLICY_3920",
+      "Ent_SMILE_3839",
+      "Ent_TODAY_4615"
+    ]
+  },
+  {
+    "cluster_id": "cluster_28",
+    "entitlements": [
+      "Ent_EXPERIENCE_2638",
+      "Ent_FINISH_6136",
+      "Ent_LIKELY_2075",
+      "Ent_NAME_3505",
+      "Ent_NEVER_3416",
+      "Ent_NICE_9469",
+      "Ent_SOMETHING_3096",
+      "Ent_TALK_3380",
+      "Ent_YEAH_4249"
+    ]
+  },
+  {
+    "cluster_id": "cluster_29",
+    "entitlements": [
+      "Ent_AGE_5520",
+      "Ent_CHILD_5054",
+      "Ent_ECONOMY_5533",
+      "Ent_LOOK_9672",
+      "Ent_PLAN_4645",
+      "Ent_SEEK_5815",
+      "Ent_WE_2280"
+    ]
+  },
+  {
+    "cluster_id": "cluster_30",
+    "entitlements": [
+      "Ent_ALONE_7521",
+      "Ent_ANIMAL_5827",
+      "Ent_ANYTHING_3808",
+      "Ent_BAR_8135",
+      "Ent_BETTER_3489",
+      "Ent_BOX_6394",
+      "Ent_CATCH_6243",
+      "Ent_COLOR_4503",
+      "Ent_CONSUMER_1838",
+      "Ent_CUSTOMER_4293",
+      "Ent_DEMOCRATIC_5317",
+      "Ent_ECONOMY_6319",
+      "Ent_EVEN_7149",
+      "Ent_EVIDENCE_6764",
+      "Ent_FEEL_9575",
+      "Ent_HOPE_3019",
+      "Ent_IDENTIFY_7116",
+      "Ent_INTERNATIONAL_8263",
+      "Ent_INTO_2312",
+      "Ent_LEVEL_4471",
+      "Ent_MAGAZINE_2440",
+      "Ent_MONTH_9897",
+      "Ent_ORDER_1757",
+      "Ent_PAST_3819",
+      "Ent_POPULAR_5771",
+      "Ent_RESOURCE_5567",
+      "Ent_RICH_3419",
+      "Ent_RULE_5797",
+      "Ent_SECOND_9130",
+      "Ent_SECTION_6796",
+      "Ent_SIMILAR_7751",
+      "Ent_THOUGHT_6313"
+    ]
+  },
+  {
+    "cluster_id": "cluster_31",
+    "entitlements": [
+      "Ent_ATTACK_7703",
+      "Ent_CULTURAL_9323",
+      "Ent_DEBATE_7584",
+      "Ent_EXPECT_8697",
+      "Ent_MENTION_6446",
+      "Ent_METHOD_9549",
+      "Ent_PART_4546",
+      "Ent_RED_1830",
+      "Ent_SPORT_8937",
+      "Ent_STREET_4932",
+      "Ent_SYSTEM_3645",
+      "Ent_WELL_4445",
+      "Ent_WIND_9551"
+    ]
+  },
+  {
+    "cluster_id": "cluster_32",
+    "entitlements": [
+      "Ent_CULTURE_4135",
+      "Ent_GIRL_5818",
+      "Ent_GOOD_4370",
+      "Ent_HER_2108",
+      "Ent_PEACE_3821",
+      "Ent_SENSE_7024",
+      "Ent_THEN_5356",
+      "Ent_VALUE_4477"
+    ]
+  },
+  {
+    "cluster_id": "cluster_33",
+    "entitlements": [
+      "Ent_DIRECTOR_6008",
+      "Ent_GIRL_7375",
+      "Ent_MENTION_8236",
+      "Ent_SMILE_6315",
+      "Ent_WHOLE_5868"
+    ]
+  },
+  {
+    "cluster_id": "cluster_34",
+    "entitlements": [
+      "Ent_AND_5339",
+      "Ent_BIT_8231",
+      "Ent_ESPECIALLY_1301",
+      "Ent_FEAR_1025",
+      "Ent_HEAR_8710",
+      "Ent_LEADER_5161",
+      "Ent_PROCESS_7037",
+      "Ent_SEEK_9341",
+      "Ent_SPACE_5932",
+      "Ent_WHOSE_4725"
+    ]
+  },
+  {
+    "cluster_id": "cluster_35",
+    "entitlements": [
+      "Ent_ASK_3826",
+      "Ent_BEGIN_7516",
+      "Ent_BOTH_4547",
+      "Ent_CITY_9126",
+      "Ent_COST_7856",
+      "Ent_DATA_9242",
+      "Ent_ENTER_9944",
+      "Ent_ENVIRONMENT_4340",
+      "Ent_FILM_3415",
+      "Ent_ITEM_6745",
+      "Ent_REVEAL_4289",
+      "Ent_SUCCESSFUL_3088",
+      "Ent_US_8496"
+    ]
+  },
+  {
+    "cluster_id": "cluster_36",
+    "entitlements": [
+      "Ent_AREA_5482",
+      "Ent_FOUR_2509",
+      "Ent_GO_9289",
+      "Ent_MYSELF_7436",
+      "Ent_OPPORTUNITY_3934",
+      "Ent_PROFESSOR_9722",
+      "Ent_STAFF_4520",
+      "Ent_THOSE_2927",
+      "Ent_TRUTH_8087"
+    ]
+  },
+  {
+    "cluster_id": "cluster_37",
+    "entitlements": [
+      "Ent_CHILD_2352",
+      "Ent_COURT_4244",
+      "Ent_DESPITE_3389",
+      "Ent_EIGHT_6757",
+      "Ent_OUR_3584",
+      "Ent_RECOGNIZE_5393",
+      "Ent_REPUBLICAN_6867",
+      "Ent_SUDDENLY_3380"
+    ]
+  },
+  {
+    "cluster_id": "cluster_38",
+    "entitlements": [
+      "Ent_GROUP_5929",
+      "Ent_MODEL_3650",
+      "Ent_OFFICIAL_7233",
+      "Ent_ONE_8732",
+      "Ent_PREVENT_2561",
+      "Ent_WHERE_8623"
+    ]
+  },
+  {
+    "cluster_id": "cluster_39",
+    "entitlements": [
+      "Ent_DEGREE_9016",
+      "Ent_DEMOCRAT_4174",
+      "Ent_EVERYTHING_2145",
+      "Ent_OPPORTUNITY_9521",
+      "Ent_PUBLIC_9198",
+      "Ent_WHAT_8347",
+      "Ent_YARD_9283"
+    ]
+  },
+  {
+    "cluster_id": "cluster_40",
+    "entitlements": [
+      "Ent_BEGIN_8798",
+      "Ent_CARD_5037",
+      "Ent_COUNTRY_5364",
+      "Ent_ENERGY_6170",
+      "Ent_FATHER_1791",
+      "Ent_HAVE_9003",
+      "Ent_ITS_3405",
+      "Ent_JOB_8870",
+      "Ent_LARGE_9380",
+      "Ent_LIFE_4249",
+      "Ent_POOR_9833",
+      "Ent_SUCH_7098"
+    ]
+  }
+]
