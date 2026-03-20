@@ -1,0 +1,30 @@
+# How many accounts will get impacted on an entitlement change
+MATCH (e:Entitlement {entitlement_name: "Ent_ENJOY_1147"})<-[:HAS_ENTITLEMENT]-(a:Account)
+RETURN e.entitlement_name AS Entitlement, count(a) AS ImpactedAccounts
+
+# Audit entitlements for the highest impact
+MATCH (a:Account)-[:HAS_ENTITLEMENT]->(e:Entitlement)
+WITH e, count(a) AS TotalImpact
+RETURN e.entitlement_name, TotalImpact
+ORDER BY TotalImpact DESC
+
+# Impact of entitlement change on active users (return user details as list)
+MATCH (e:Entitlement {entitlement_name: 'Ent_ENJOY_1147'})<-[:HAS_ENTITLEMENT]-(a:Account)
+WITH e, count(a) AS TotalImpact, a
+WHERE a.status = "Active"
+RETURN e.entitlement_name AS EntitlementID, 
+       collect(a.account_name) AS ActiveUsers,
+       count(a) as Impacted
+       
+# Impact of entitlement change to users in percentages (affected to all)
+MATCH (total:Account {status: "Active"})
+WITH count(total) AS GlobalTotal
+
+MATCH (e:Entitlement {entitlement_name: 'Ent_ENJOY_1147'})<-[:HAS_ENTITLEMENT]-(a:Account)
+WHERE a.status = "Active"
+
+WITH e, GlobalTotal, count(a) AS ImpactedCount
+RETURN e.entitlement_name AS EntitlementID,
+       ImpactedCount,
+       GlobalTotal,
+       (toFloat(ImpactedCount) / GlobalTotal) * 100 AS ImpactPercentage
