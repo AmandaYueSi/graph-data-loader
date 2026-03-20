@@ -1,95 +1,46 @@
 package com.graphdataloader.roleminingbackend.config;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+@Getter
+@Setter
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
 
     private final Security security = new Security();
     private final Data data = new Data();
     private final Neo4j neo4j = new Neo4j();
+    private final Ai ai = new Ai();
 
-    public Security getSecurity() {
-        return security;
-    }
-
-    public Data getData() {
-        return data;
-    }
-
-    public Neo4j getNeo4j() {
-        return neo4j;
-    }
-
+    @Getter
+    @Setter
     public static class Security {
         private String defaultUserId;
-
-        public String getDefaultUserId() {
-            return defaultUserId;
-        }
-
-        public void setDefaultUserId(String defaultUserId) {
-            this.defaultUserId = defaultUserId;
-        }
     }
 
+    @Getter
+    @Setter
     public static class Data {
         private String roleCandidatesPath;
         private String reviewOverlaysPath;
         private boolean ownershipScopingEnabled;
-
-        public String getRoleCandidatesPath() {
-            return roleCandidatesPath;
-        }
-
-        public void setRoleCandidatesPath(String roleCandidatesPath) {
-            this.roleCandidatesPath = roleCandidatesPath;
-        }
-
-        public String getReviewOverlaysPath() {
-            return reviewOverlaysPath;
-        }
-
-        public void setReviewOverlaysPath(String reviewOverlaysPath) {
-            this.reviewOverlaysPath = reviewOverlaysPath;
-        }
-
-        public boolean isOwnershipScopingEnabled() {
-            return ownershipScopingEnabled;
-        }
-
-        public void setOwnershipScopingEnabled(boolean ownershipScopingEnabled) {
-            this.ownershipScopingEnabled = ownershipScopingEnabled;
-        }
     }
 
+    @Getter
+    @Setter
     public static class Neo4j {
         private String uri;
         private String username;
         private String password;
+    }
 
-        public String getUri() {
-            return uri;
-        }
-
-        public void setUri(String uri) {
-            this.uri = uri;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
+    @Getter
+    @Setter
+    public static class Ai {
+        private String openAiApiKey;
+        private String awsRegion;
+        private String bedrockModelId;
     }
 }

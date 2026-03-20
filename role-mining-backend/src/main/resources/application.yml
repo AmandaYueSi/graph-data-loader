@@ -18,3 +18,20 @@ app:
     uri: "${NEO4J_URI:neo4j://127.0.0.1:7687}"
     username: "${NEO4J_USERNAME:neo4j}"
     password: "${NEO4J_PASSWORD:your_password}"
+  ai:
+    open-ai-api-key: "${OPENAI_API_KEY:your_api_key_here}"
+    aws-region: "${AWS_REGION:us-east-1}"
+    bedrock-model-id: "${BEDROCK_MODEL_ID:amazon.titan-text-express-v1}"
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    shutdown:
+      enabled: true
+  endpoint:
+    shutdown:
+      enabled: true
+    
