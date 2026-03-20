@@ -82,3 +82,14 @@ export type BusinessOwnerApiProfile = {
   domain: string;
   business_responsibility: string;
 };
+
+export type EntitlementApi = {
+  entitlement_id: string;
+  entitlement_name: string;
+  application_id: string;
+  application_name: string;
+  business_owner_id: string;
+  business_owner_name: string;
+  risk_level: string;
+  sensitive: boolean;
+};

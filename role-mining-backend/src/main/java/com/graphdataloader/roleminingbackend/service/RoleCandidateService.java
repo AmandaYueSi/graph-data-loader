@@ -12,6 +12,9 @@ import com.graphdataloader.roleminingbackend.repository.RoleCandidateRepository;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,6 +41,8 @@ public class RoleCandidateService {
             .filter(candidate -> matches(candidate.dominantDepartment(), department))
             .filter(candidate -> matches(candidate.dominantLocation(), location))
             .filter(candidate -> matchesKeyword(candidate, keyword))
+            .collect(Collectors.collectingAndThen(Collectors.toList(), this::deduplicateNearEquivalentCandidates))
+            .stream()
             .sorted(Comparator.comparingDouble(RoleCandidate::supportScore).reversed())
             .map(this::toResponse)
             .toList();
@@ -95,6 +100,38 @@ public class RoleCandidateService {
             || candidate.entitlementSet().stream().anyMatch(item -> item.toLowerCase().contains(normalized));
     }
 
+    private List<RoleCandidate> deduplicateNearEquivalentCandidates(List<RoleCandidate> candidates) {
+        Map<DeduplicationKey, RoleCandidate> deduplicated = candidates.stream()
+            .collect(Collectors.toMap(
+                this::toDeduplicationKey,
+                Function.identity(),
+                this::pickPreferredCandidate
+            ));
+        return deduplicated.values().stream().toList();
+    }
+
+    private DeduplicationKey toDeduplicationKey(RoleCandidate candidate) {
+        return new DeduplicationKey(
+            candidate.userCount(),
+            candidate.supportScore(),
+            candidate.cohortScope(),
+            candidate.candidateType(),
+            candidate.dominantDepartment(),
+            candidate.dominantJobTitle(),
+            candidate.dominantLocation()
+        );
+    }
+
+    private RoleCandidate pickPreferredCandidate(RoleCandidate left, RoleCandidate right) {
+        Comparator<RoleCandidate> comparator = Comparator
+            .comparingInt((RoleCandidate candidate) -> candidate.entitlementSet().size()).reversed()
+            .thenComparingDouble(RoleCandidate::ruleLift).reversed()
+            .thenComparingDouble(RoleCandidate::ruleConfidence).reversed()
+            .thenComparing(RoleCandidate::roleCandidateId);
+
+        return comparator.compare(left, right) <= 0 ? left : right;
+    }
+
     private RoleCandidateResponse toResponse(RoleCandidate candidate) {
         return new RoleCandidateResponse(
             candidate.roleCandidateId(),
@@ -112,5 +149,16 @@ public class RoleCandidateService {
             candidate.status(),
             candidate.reviewMetadata()
         );
+    }
+
+    private record DeduplicationKey(
+        int userCount,
+        double supportScore,
+        String cohortScope,
+        String candidateType,
+        String dominantDepartment,
+        String dominantJobTitle,
+        String dominantLocation
+    ) {
     }
 }

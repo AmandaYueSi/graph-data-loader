@@ -10,20 +10,25 @@ import com.theokanning.openai.service.OpenAiService;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
+import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClientBuilder;
 import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelRequest;
 import software.amazon.awssdk.services.bedrockruntime.model.InvokeModelResponse;
 
-@Slf4j
 @Service
 public class DynamicImpactService {
+    private static final Logger log = LoggerFactory.getLogger(DynamicImpactService.class);
 
     private final Driver driver;
     private final AppProperties properties;
@@ -37,10 +42,20 @@ public class DynamicImpactService {
 
     public List<ImpactResult> analyzeImpact(String term, String type) {
         String query = type.equalsIgnoreCase("app") ? getAppImpactQuery() : getEntitlementImpactQuery();
+        String queryType = type.equalsIgnoreCase("app") ? "application" : "entitlement";
+        Map<String, Object> params = Map.of("term", term);
+        log.info(
+            "Starting dynamic impact analysis: term='{}', type='{}', queryType='{}'",
+            term,
+            type,
+            queryType
+        );
+        log.info("Dynamic impact Cypher query for term='{}':\n{}", term, query);
+        log.info("Dynamic impact query params: {}", params);
         
         try (Session session = driver.session()) {
-            return session.executeRead(tx -> {
-                Result result = tx.run(query, Map.of("term", term));
+            List<ImpactResult> results = session.executeRead(tx -> {
+                Result result = tx.run(query, params);
                 return result.list(record -> {
                     String id = record.get(0).asString();
                     String name = record.get(1).asString();
@@ -62,12 +77,26 @@ public class DynamicImpactService {
                         .topDepartments(topDepartments)
                         .build();
 
+                    log.info(
+                        "Impact query matched node: id='{}', name='{}', totalUsers={}, topDepartments={}",
+                        id,
+                        name,
+                        totalUsers,
+                        topDepartments.size()
+                    );
                     impactResult.setAiNarrative(generateAiNarrative(impactResult));
                     return impactResult;
                 });
             });
+            log.info(
+                "Finished dynamic impact analysis: term='{}', type='{}', matchedResults={}",
+                term,
+                type,
+                results.size()
+            );
+            return results;
         } catch (Exception e) {
-            log.error("Error analyzing impact for term: {}", term, e);
+            log.error("Error analyzing impact for term='{}', type='{}'", term, type, e);
             return Collections.emptyList();
         }
     }
@@ -81,17 +110,49 @@ public class DynamicImpactService {
 
         // Try Bedrock first
         if (properties.getAi().getAwsRegion() != null && !properties.getAi().getAwsRegion().isBlank()) {
-            String narrative = generateBedrockNarrative(prompt);
-            if (narrative != null) return narrative;
+            if (hasAwsCredentialsConfigured()) {
+                log.info(
+                    "Attempting Bedrock narrative generation for impact result id='{}'",
+                    result.getId()
+                );
+                String narrative = generateBedrockNarrative(prompt);
+                if (narrative != null) {
+                    log.info(
+                        "Bedrock narrative generation succeeded for impact result id='{}'",
+                        result.getId()
+                    );
+                    return narrative;
+                }
+            } else {
+                log.warn(
+                    "Skipping Bedrock narrative generation for impact result id='{}' because AWS credentials are not configured",
+                    result.getId()
+                );
+            }
         }
 
         // Try OpenAI second
         if (properties.getAi().getOpenAiApiKey() != null && !properties.getAi().getOpenAiApiKey().isBlank() && !properties.getAi().getOpenAiApiKey().equals("your_api_key_here")) {
+            log.info(
+                "Attempting OpenAI narrative generation for impact result id='{}'",
+                result.getId()
+            );
             String narrative = generateOpenAiNarrative(prompt);
-            if (narrative != null) return narrative;
+            if (narrative != null) {
+                log.info(
+                    "OpenAI narrative generation succeeded for impact result id='{}'",
+                    result.getId()
+                );
+                return narrative;
+            }
         }
 
         // Fallback
+        log.info(
+            "Falling back to deterministic impact narrative for result id='{}', totalUsers={}",
+            result.getId(),
+            result.getTotalUsers()
+        );
         if (result.getTotalUsers() > 500) {
             return String.format("CRITICAL: Removal of this %s will cause widespread disruption in %s. Suggest gradual roll-off.", 
                 result.getType(), result.getTopDepartments().get(0).getDepartment());
@@ -99,6 +160,19 @@ public class DynamicImpactService {
             return String.format("MODERATE: Limited impact focused on %s. Risk is localized.", 
                 result.getTopDepartments().get(0).getDepartment());
         }
+    }
+
+    private boolean hasAwsCredentialsConfigured() {
+        return hasValue(properties.getAi().getAwsAccessKeyId())
+            && hasValue(properties.getAi().getAwsSecretAccessKey())
+            || hasValue(System.getenv("AWS_ACCESS_KEY_ID"))
+            && hasValue(System.getenv("AWS_SECRET_ACCESS_KEY"))
+            || hasValue(System.getProperty("aws.accessKeyId"))
+            && hasValue(System.getProperty("aws.secretAccessKey"));
+    }
+
+    private boolean hasValue(String value) {
+        return value != null && !value.isBlank();
     }
 
     private String generateOpenAiNarrative(String prompt) {
@@ -118,9 +192,34 @@ public class DynamicImpactService {
 
     private String generateBedrockNarrative(String prompt) {
         String modelId = properties.getAi().getBedrockModelId() != null ? properties.getAi().getBedrockModelId() : "amazon.titan-text-express-v1";
-        try (BedrockRuntimeClient client = BedrockRuntimeClient.builder()
-                .region(Region.of(properties.getAi().getAwsRegion()))
-                .build()) {
+        BedrockRuntimeClientBuilder clientBuilder = BedrockRuntimeClient.builder()
+            .region(Region.of(properties.getAi().getAwsRegion()));
+
+        if (hasValue(properties.getAi().getAwsAccessKeyId())
+            && hasValue(properties.getAi().getAwsSecretAccessKey())) {
+            if (hasValue(properties.getAi().getAwsSessionToken())) {
+                clientBuilder.credentialsProvider(
+                    StaticCredentialsProvider.create(
+                        AwsSessionCredentials.create(
+                            properties.getAi().getAwsAccessKeyId(),
+                            properties.getAi().getAwsSecretAccessKey(),
+                            properties.getAi().getAwsSessionToken()
+                        )
+                    )
+                );
+            } else {
+                clientBuilder.credentialsProvider(
+                    StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create(
+                            properties.getAi().getAwsAccessKeyId(),
+                            properties.getAi().getAwsSecretAccessKey()
+                        )
+                    )
+                );
+            }
+        }
+
+        try (BedrockRuntimeClient client = clientBuilder.build()) {
             
             String body;
             if (modelId.contains("amazon")) {
@@ -204,13 +303,13 @@ public class DynamicImpactService {
     private String getEntitlementImpactQuery() {
         return """
         MATCH (e:Entitlement)
-        WHERE e.entitlementId CONTAINS $term OR e.entitlement_name CONTAINS $term
+        WHERE e.entitlement_id CONTAINS $term OR e.entitlement_name CONTAINS $term
         
         // Path 1: Direct via Account
-        OPTIONAL MATCH (e)<-[:HAS_ENTITLEMENT]-(acc:Account)-[:BELONGS_TO]->(u1:Identity)
+        OPTIONAL MATCH (e)<-[:HAS_ENTITLEMENT]-(acc:Account)-[:HAS_ACCOUNT]->(u1:Identity)
         
         // Path 2: Indirect via Groups
-        OPTIONAL MATCH (e)<-[:GRANTS]-(grp:EntitlementGroup)<-[:PARENT_OF*0..]-(top_grp:EntitlementGroup)<-[:MEMBER_OF]-(u2:Identity)
+        OPTIONAL MATCH (e)<-[:CONTAINS_ENTITLEMENT]-(grp:EntitlementGroup)<-[:MEMBER_OF_GROUP]-(u2:Identity)
         
         WITH e, collect(DISTINCT u1) + collect(DISTINCT u2) AS all_users
         UNWIND all_users AS user
@@ -222,8 +321,8 @@ public class DynamicImpactService {
         ORDER BY dept_count DESC
         
         RETURN 
-            e.entitlementId AS entitlementId,
-            e.entitlement_name AS name,
+            e.entitlement_id AS entitlementId,
+            e.name AS name,
             total_users,
             collect({department: dept, count: dept_count})[0..3] AS top_departments
         """;

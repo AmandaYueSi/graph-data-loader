@@ -21,7 +21,10 @@ app:
   ai:
     open-ai-api-key: "${OPENAI_API_KEY:your_api_key_here}"
     aws-region: "${AWS_REGION:us-east-1}"
-    bedrock-model-id: "${BEDROCK_MODEL_ID:amazon.titan-text-express-v1}"
+    aws-access-key-id: "${AWS_ACCESS_KEY_ID:}"
+    aws-secret-access-key: "${AWS_SECRET_ACCESS_KEY:}"
+    aws-session-token: "${AWS_SESSION_TOKEN:}"
+    bedrock-model-id: "${BEDROCK_MODEL_ID:mistral.mistral-large-2402-v1:0}"
 
 
 management:

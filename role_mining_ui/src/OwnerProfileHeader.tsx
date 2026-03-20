@@ -19,12 +19,14 @@ export default function OwnerProfileHeader({
 			position="static"
 			elevation={0}
 			sx={{
+				borderRadius: "10px",
 				bgcolor: "rgba(12, 44, 54, 0.92)",
 				backgroundImage:
 					"linear-gradient(135deg, rgba(15,76,92,0.94), rgba(7,40,50,0.94))",
 				px: 3,
 				py: 2,
 				mb: 3,
+				overflow: "hidden",
 			}}
 		>
 			<Stack

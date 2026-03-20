@@ -1,21 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  Box,
-  Chip,
-  Grid,
-  LinearProgress,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Chip, Grid, LinearProgress, Stack, Typography } from "@mui/material";
 import { GridColDef, GridPaginationModel } from "@mui/x-data-grid";
-import {
-  entitlementMetadata,
-  loggedInOwner,
-  roleCandidates as seedCandidates,
-} from "./mockData";
+import { entitlementMetadata, loggedInOwner, roleCandidates as seedCandidates } from "./mockData";
 import {
   BusinessOwner,
   BusinessOwnerApiProfile,
+  EntitlementApi,
   EntitlementMeta,
   PagedResponse,
   ReviewStatus,
@@ -43,7 +33,7 @@ const statusColors: Record<
   "Needs Review": "info",
 };
 
-const tabs = ["Candidate Roles", "Entitlements", "Analytics / Graph View"];
+const tabs = ["Candidate Roles", "Entitlements", "Impact Analysis"] as const;
 const API_BASE_URL = "http://localhost:8080";
 
 function formatPercent(value: number) {
@@ -71,7 +61,7 @@ function getEntitlementMeta(entitlementId: string): EntitlementMeta {
 function groupEntitlements(entitlementIds: string[]) {
   return entitlementIds.reduce<Record<string, EntitlementMeta[]>>((acc, id) => {
     const meta = getEntitlementMeta(id);
-    const key = meta?.application ?? "Unknown";
+    const key = meta.application;
     acc[key] = [...(acc[key] ?? []), meta];
     return acc;
   }, {});
@@ -98,7 +88,7 @@ function mapRoleCandidate(apiCandidate: RoleCandidateApi): RoleCandidate {
     ...new Set(
       apiCandidate.entitlement_set
         .map((entitlementId) => getEntitlementMeta(entitlementId).application)
-        .filter(Boolean)
+        .filter(Boolean),
     ),
   ] as string[];
 
@@ -122,25 +112,22 @@ function filterLocalCandidates(
     departmentFilter: string;
     locationFilter: string;
     typeFilter: string;
-  }
+  },
 ) {
   return source.filter((candidate) => {
     const matchesSearch =
       !filters.search ||
-      candidate.role_name
-        .toLowerCase()
-        .includes(filters.search.toLowerCase()) ||
+      candidate.role_name.toLowerCase().includes(filters.search.toLowerCase()) ||
       candidate.role_candidate_id
         .toLowerCase()
         .includes(filters.search.toLowerCase()) ||
       candidate.entitlement_set.some((entitlement) =>
         getEntitlementMeta(entitlement)
           .displayName.toLowerCase()
-          .includes(filters.search.toLowerCase())
+          .includes(filters.search.toLowerCase()),
       );
     const matchesStatus =
-      filters.statusFilter === "All" ||
-      candidate.status === filters.statusFilter;
+      filters.statusFilter === "All" || candidate.status === filters.statusFilter;
     const matchesDepartment =
       filters.departmentFilter === "All" ||
       candidate.dominant_department === filters.departmentFilter;
@@ -167,30 +154,40 @@ function toApiStatus(status: ReviewStatus | "All") {
   return status.toUpperCase().replace(/\s+/g, "_");
 }
 
+function getSupportBand(supportScore: number) {
+  if (supportScore >= 0.15) {
+    return { label: "Strong", color: "success" as const };
+  }
+  if (supportScore >= 0.08) {
+    return { label: "Moderate", color: "warning" as const };
+  }
+  return { label: "Emerging", color: "default" as const };
+}
+
 export default function App() {
   const [owner, setOwner] = useState<BusinessOwner>(loggedInOwner);
   const [ownerLoading, setOwnerLoading] = useState(true);
-  const [ownerError, setOwnerError] = useState<string>("");
+  const [ownerError, setOwnerError] = useState("");
+  const [ownedEntitlementCount, setOwnedEntitlementCount] = useState(
+    new Set(seedCandidates.flatMap((candidate) => candidate.entitlement_set)).size,
+  );
+
   const [candidates, setCandidates] = useState<RoleCandidate[]>(seedCandidates);
   const [candidatesLoading, setCandidatesLoading] = useState(true);
   const [candidatesError, setCandidatesError] = useState("");
   const [totalCandidates, setTotalCandidates] = useState(seedCandidates.length);
-  const [selectedId, setSelectedId] = useState<string>(
-    seedCandidates[0]?.role_candidate_id ?? ""
-  );
+  const [selectedId, setSelectedId] = useState("");
   const [tabIndex, setTabIndex] = useState(0);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<ReviewStatus | "All">("All");
-  const [departmentFilter, setDepartmentFilter] = useState<string>("All");
-  const [locationFilter, setLocationFilter] = useState<string>("All");
-  const [typeFilter, setTypeFilter] = useState<string>("All");
+  const [departmentFilter, setDepartmentFilter] = useState("All");
+  const [locationFilter, setLocationFilter] = useState("All");
+  const [typeFilter, setTypeFilter] = useState("All");
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 0,
     pageSize: 8,
   });
-  const [compareTarget, setCompareTarget] = useState<RoleCandidate | null>(
-    null
-  );
+  const [compareTarget, setCompareTarget] = useState<RoleCandidate | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -205,9 +202,7 @@ export default function App() {
           },
         });
         if (!response.ok) {
-          throw new Error(
-            `Profile request failed with status ${response.status}`
-          );
+          throw new Error(`Profile request failed with status ${response.status}`);
         }
 
         const data: BusinessOwnerApiProfile = await response.json();
@@ -215,26 +210,24 @@ export default function App() {
           return;
         }
 
-        const nextOwner: BusinessOwner = {
+        setOwner({
           ownerId: data.business_owner_id,
           name: data.name,
           title: data.title,
           department: data.department,
           domain: data.domain || loggedInOwner.domain,
           businessResponsibility: data.business_responsibility,
-        };
-        setOwner(nextOwner);
+        });
         setOwnerError("");
       } catch (error) {
-        if (ignore) {
-          return;
+        if (!ignore) {
+          setOwner(loggedInOwner);
+          setOwnerError(
+            error instanceof Error
+              ? error.message
+              : "Failed to load business owner profile.",
+          );
         }
-        setOwner(loggedInOwner);
-        setOwnerError(
-          error instanceof Error
-            ? error.message
-            : "Failed to load business owner profile."
-        );
       } finally {
         if (!ignore) {
           setOwnerLoading(false);
@@ -249,8 +242,47 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    let ignore = false;
+
+    async function loadOwnedEntitlements() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/entitlements`, {
+          headers: {
+            "X-User-Id": loggedInOwner.ownerId,
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`Entitlements request failed with status ${response.status}`);
+        }
+
+        const data: EntitlementApi[] = await response.json();
+        if (!ignore) {
+          setOwnedEntitlementCount(data.length);
+        }
+      } catch {
+        if (!ignore) {
+          setOwnedEntitlementCount(
+            new Set(seedCandidates.flatMap((candidate) => candidate.entitlement_set))
+              .size,
+          );
+        }
+      }
+    }
+
+    loadOwnedEntitlements();
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  useEffect(() => {
     setPaginationModel((current) => ({ ...current, page: 0 }));
+    setSelectedId("");
   }, [search, statusFilter, departmentFilter, locationFilter, typeFilter]);
+
+  useEffect(() => {
+    setSelectedId("");
+  }, [paginationModel.page, paginationModel.pageSize]);
 
   useEffect(() => {
     let ignore = false;
@@ -258,6 +290,7 @@ export default function App() {
     async function loadRoleCandidates() {
       try {
         setCandidatesLoading(true);
+
         const params = new URLSearchParams({
           page: String(paginationModel.page),
           size: String(paginationModel.pageSize),
@@ -284,62 +317,39 @@ export default function App() {
             headers: {
               "X-User-Id": loggedInOwner.ownerId,
             },
-          }
+          },
         );
         if (!response.ok) {
           throw new Error(
-            `Role candidates request failed with status ${response.status}`
+            `Role candidates request failed with status ${response.status}`,
           );
         }
 
         const data: PagedResponse<RoleCandidateApi> = await response.json();
-        if (ignore) {
-          return;
+        if (!ignore) {
+          setCandidates(data.content.map(mapRoleCandidate));
+          setTotalCandidates(data.total_elements);
+          setCandidatesError("");
         }
-
-        const nextCandidates = data.content.map(mapRoleCandidate);
-        setCandidates(nextCandidates);
-        setTotalCandidates(data.total_elements);
-        setCandidatesError("");
-        setSelectedId((current) => {
-          if (
-            nextCandidates.some(
-              (candidate) => candidate.role_candidate_id === current
-            )
-          ) {
-            return current;
-          }
-          return nextCandidates[0]?.role_candidate_id ?? "";
-        });
       } catch (error) {
-        if (ignore) {
-          return;
+        if (!ignore) {
+          const locallyFiltered = filterLocalCandidates(seedCandidates, {
+            search,
+            statusFilter,
+            departmentFilter,
+            locationFilter,
+            typeFilter,
+          });
+          const fromIndex = paginationModel.page * paginationModel.pageSize;
+          const toIndex = fromIndex + paginationModel.pageSize;
+          setCandidates(locallyFiltered.slice(fromIndex, toIndex));
+          setTotalCandidates(locallyFiltered.length);
+          setCandidatesError(
+            error instanceof Error
+              ? error.message
+              : "Failed to load role candidates.",
+          );
         }
-        const locallyFiltered = filterLocalCandidates(seedCandidates, {
-          search,
-          statusFilter,
-          departmentFilter,
-          locationFilter,
-          typeFilter,
-        });
-        const fromIndex = paginationModel.page * paginationModel.pageSize;
-        const toIndex = fromIndex + paginationModel.pageSize;
-        const paged = locallyFiltered.slice(fromIndex, toIndex);
-        setCandidates(paged);
-        setTotalCandidates(locallyFiltered.length);
-        setCandidatesError(
-          error instanceof Error
-            ? error.message
-            : "Failed to load role candidates."
-        );
-        setSelectedId((current) => {
-          if (
-            paged.some((candidate) => candidate.role_candidate_id === current)
-          ) {
-            return current;
-          }
-          return paged[0]?.role_candidate_id ?? "";
-        });
       } finally {
         if (!ignore) {
           setCandidatesLoading(false);
@@ -352,33 +362,33 @@ export default function App() {
       ignore = true;
     };
   }, [
-    departmentFilter,
-    locationFilter,
-    paginationModel.page,
-    paginationModel.pageSize,
     search,
     statusFilter,
+    departmentFilter,
+    locationFilter,
     typeFilter,
+    paginationModel.page,
+    paginationModel.pageSize,
   ]);
 
   const selectedCandidate =
-    candidates.find(
-      (candidate) => candidate.role_candidate_id === selectedId
-    ) ?? null;
+    candidates.find((candidate) => candidate.role_candidate_id === selectedId) ??
+    null;
 
   const departments = useMemo(
     () => [
       "All",
       ...new Set(candidates.map((candidate) => candidate.dominant_department)),
     ],
-    [candidates]
+    [candidates],
   );
+
   const locations = useMemo(
     () => [
       "All",
       ...new Set(candidates.map((candidate) => candidate.dominant_location)),
     ],
-    [candidates]
+    [candidates],
   );
 
   const entitlementStats = useMemo(() => {
@@ -388,51 +398,50 @@ export default function App() {
         counts.set(entitlement, (counts.get(entitlement) ?? 0) + 1);
       });
     });
+
     return [...counts.entries()]
       .map(([entitlementId, count]) => ({
         entitlementId,
         count,
         meta: getEntitlementMeta(entitlementId),
         roles: candidates.filter((candidate) =>
-          candidate.entitlement_set.includes(entitlementId)
+          candidate.entitlement_set.includes(entitlementId),
         ),
       }))
       .sort((a, b) => b.count - a.count);
   }, [candidates]);
 
   const summary = useMemo(() => {
-    const totalEntitlements = new Set(
-      candidates.flatMap((candidate) => candidate.entitlement_set)
-    ).size;
     const pending = candidates.filter(
       (candidate) =>
-        candidate.status === "Pending" || candidate.status === "Needs Review"
+        candidate.status === "Pending" || candidate.status === "Needs Review",
     ).length;
     const approved = candidates.filter(
-      (candidate) => candidate.status === "Approved"
+      (candidate) => candidate.status === "Approved",
     ).length;
     const rejected = candidates.filter(
-      (candidate) => candidate.status === "Rejected"
+      (candidate) => candidate.status === "Rejected",
     ).length;
+
     return {
-      totalEntitlements,
+      totalEntitlements: ownedEntitlementCount,
+      totalRoles: totalCandidates,
       pending,
       approved,
       rejected,
-      totalRoles: totalCandidates,
     };
-  }, [candidates, totalCandidates]);
+  }, [candidates, ownedEntitlementCount, totalCandidates]);
 
   const updateCandidate = (
     candidateId: string,
-    updater: (candidate: RoleCandidate) => RoleCandidate
+    updater: (candidate: RoleCandidate) => RoleCandidate,
   ) => {
     setCandidates((current) =>
       current.map((candidate) =>
         candidate.role_candidate_id === candidateId
           ? updater(candidate)
-          : candidate
-      )
+          : candidate,
+      ),
     );
   };
 
@@ -453,7 +462,7 @@ export default function App() {
     updateCandidate(selectedCandidate.role_candidate_id, (candidate) => ({
       ...candidate,
       entitlement_set: candidate.entitlement_set.filter(
-        (item) => item !== entitlementId
+        (item) => item !== entitlementId,
       ),
       status:
         candidate.status === "Approved" ? "Needs Review" : candidate.status,
@@ -468,6 +477,7 @@ export default function App() {
     ) {
       return;
     }
+
     updateCandidate(selectedCandidate.role_candidate_id, (candidate) => ({
       ...candidate,
       entitlement_set: [...candidate.entitlement_set, entitlementId],
@@ -479,15 +489,17 @@ export default function App() {
     if (!selectedCandidate || !compareTarget) {
       return;
     }
-    const merged = [
+
+    const mergedEntitlements = [
       ...new Set([
         ...selectedCandidate.entitlement_set,
         ...compareTarget.entitlement_set,
       ]),
     ];
+
     updateCandidate(selectedCandidate.role_candidate_id, (candidate) => ({
       ...candidate,
-      entitlement_set: merged,
+      entitlement_set: mergedEntitlements,
       role_name: `${candidate.role_name} + ${compareTarget.role_name}`,
       status: "Draft",
       notes: "Merged for analyst review. Validate overlap before approval.",
@@ -498,15 +510,9 @@ export default function App() {
   const columns: GridColDef<RoleCandidate>[] = [
     { field: "role_name", headerName: "Role Name", flex: 1.4, minWidth: 220 },
     {
-      field: "role_candidate_id",
-      headerName: "Candidate ID",
-      flex: 1,
-      minWidth: 180,
-    },
-    {
       field: "support_score",
       headerName: "Support",
-      width: 120,
+      width: 112,
       renderCell: ({ value }) => (
         <Stack sx={{ width: "100%", pt: 1 }}>
           <Typography variant="body2" fontWeight={600}>
@@ -515,31 +521,42 @@ export default function App() {
           <LinearProgress
             variant="determinate"
             value={(value as number) * 100}
-            sx={{ height: 7 }}
+            sx={{ height: 7, borderRadius: 999 }}
           />
         </Stack>
       ),
     },
-    { field: "user_count", headerName: "Users", width: 90 },
+    {
+      field: "support_band",
+      headerName: "Band",
+      width: 110,
+      sortable: false,
+      filterable: false,
+      renderCell: ({ row }) => {
+        const band = getSupportBand(row.support_score);
+        return (
+          <Chip
+            label={band.label}
+            color={band.color}
+            size="small"
+            variant="outlined"
+          />
+        );
+      },
+    },
+    { field: "user_count", headerName: "Users", width: 88 },
     {
       field: "cohort_scope",
       headerName: "Cohort Scope",
       flex: 1,
-      minWidth: 180,
+      minWidth: 168,
     },
-    { field: "candidate_type", headerName: "Type", width: 100 },
-    { field: "dominant_department", headerName: "Department", width: 150 },
-    {
-      field: "dominant_job_title",
-      headerName: "Job Title",
-      flex: 1,
-      minWidth: 180,
-    },
-    { field: "dominant_location", headerName: "Location", width: 130 },
+    { field: "candidate_type", headerName: "Type", width: 96 },
+    { field: "dominant_department", headerName: "Department", width: 132 },
     {
       field: "status",
       headerName: "Status",
-      width: 140,
+      width: 126,
       renderCell: ({ value }) => (
         <Chip
           label={value as string}
@@ -551,7 +568,14 @@ export default function App() {
   ];
 
   return (
-    <Box sx={{ minHeight: "100vh", p: { xs: 2, lg: 3 } }}>
+    <Box
+      sx={{
+        maxWidth: 1680,
+        mx: "auto",
+        px: { xs: 2, md: 3.5, xl: 5 },
+        pb: 4,
+      }}
+    >
       <OwnerProfileHeader
         owner={owner}
         ownerLoading={ownerLoading}
@@ -612,6 +636,7 @@ export default function App() {
           {tabIndex === 2 && (
             <ImpactAnalysisPanel API_BASE_URL={API_BASE_URL} />
           )}
+
         </Grid>
       </Grid>
 
@@ -626,6 +651,7 @@ export default function App() {
           groupEntitlements={groupEntitlements}
           entitlementMetadata={entitlementMetadata}
           setCompareOpen={setDialogOpen}
+          closeDrawer={() => setSelectedId("")}
         />
       )}
 

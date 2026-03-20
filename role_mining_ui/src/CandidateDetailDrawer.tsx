@@ -24,6 +24,7 @@ import {
 	CompareArrows,
 	Approval,
 	CheckCircle,
+	Close,
 } from "@mui/icons-material";
 import { RoleCandidate, EntitlementMeta, ReviewStatus } from "./types";
 
@@ -42,6 +43,7 @@ interface CandidateDetailDrawerProps {
 	) => Record<string, EntitlementMeta[]>;
 	entitlementMetadata: Record<string, EntitlementMeta>;
 	setCompareOpen: (v: boolean) => void;
+	closeDrawer: () => void;
 }
 
 export default function CandidateDetailDrawer({
@@ -54,6 +56,7 @@ export default function CandidateDetailDrawer({
 	groupEntitlements,
 	entitlementMetadata,
 	setCompareOpen,
+	closeDrawer,
 }: CandidateDetailDrawerProps) {
 	function formatPercent(value: number) {
 		return `${Math.round(value * 100)}%`;
@@ -62,10 +65,8 @@ export default function CandidateDetailDrawer({
 		<Drawer
 			anchor="right"
 			open={Boolean(selectedCandidate)}
-			onClose={() =>
-				updateCandidate(selectedCandidate.role_candidate_id, (c) => c)
-			}
-			variant="persistent"
+			onClose={closeDrawer}
+			variant="temporary"
 			sx={{
 				"& .MuiDrawer-paper": {
 					width: { xs: "100%", md: 460 },
@@ -77,10 +78,15 @@ export default function CandidateDetailDrawer({
 		>
 			<Stack direction="row" justifyContent="space-between" alignItems="center">
 				<Typography variant="h5">Candidate Detail</Typography>
-				<Chip
-					label={selectedCandidate.status}
-					// color={statusColors[selectedCandidate.status]}
-				/>
+				<Stack direction="row" spacing={1} alignItems="center">
+					<Chip
+						label={selectedCandidate.status}
+						color={statusColors[selectedCandidate.status] as any}
+					/>
+					<IconButton onClick={closeDrawer} aria-label="Close candidate detail">
+						<Close />
+					</IconButton>
+				</Stack>
 			</Stack>
 			<TextField
 				label="Role Name"

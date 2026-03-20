@@ -118,6 +118,7 @@ export default function CandidateRoleTable({
 					setPaginationModel({ page: 0, pageSize: Number(event.target.value) })
 				}
 				rowsPerPageOptions={[8, 16, 25]}
+				sx={{ mt: -0.5, px: 1 }}
 			/>
 		</Paper>
 	);

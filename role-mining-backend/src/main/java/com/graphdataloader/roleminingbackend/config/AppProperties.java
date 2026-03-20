@@ -41,6 +41,9 @@ public class AppProperties {
     public static class Ai {
         private String openAiApiKey;
         private String awsRegion;
+        private String awsAccessKeyId;
+        private String awsSecretAccessKey;
+        private String awsSessionToken;
         private String bedrockModelId;
     }
 }

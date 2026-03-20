@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/mockdata.ts","./src/types.ts"],"version":"5.9.3"}
+{"root":["./src/app.tsx","./src/candidatedetaildrawer.tsx","./src/candidateroletable.tsx","./src/comparedialog.tsx","./src/entitlementstatspanel.tsx","./src/impactanalysispanel.tsx","./src/ownerprofileheader.tsx","./src/reviewfilterspanel.tsx","./src/summarycards.tsx","./src/tabpanelheader.tsx","./src/main.tsx","./src/mockdata.ts","./src/types.ts"],"version":"5.9.3"}
